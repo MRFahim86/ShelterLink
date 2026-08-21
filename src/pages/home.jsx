@@ -20,29 +20,56 @@ function Home() {
           </div>
 
           {/* Navigation */}
-          <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-8 md:flex">
 
-            <a href="#home" className="hover:text-green-700">
-              Home
-            </a>
+  {/* Login */}
+  <a
+    href="/login"
+    className="font-medium text-gray-800 hover:text-green-700"
+  >
+    Login
+  </a>
 
-            <a href="#services" className="hover:text-green-700">
-              Services
-            </a>
+  {/* Home */}
+  <a
+    href="#home"
+    className="hover:text-green-700"
+  >
+    Home
+  </a>
 
-            <a href="#find-help" className="hover:text-green-700">
-              Find Help
-            </a>
+  {/* Services */}
+  <a
+    href="#services"
+    className="hover:text-green-700"
+  >
+    Services
+  </a>
 
-            <a href="#donate" className="hover:text-green-700">
-              Donate
-            </a>
+  {/* Find Help */}
+  <a
+    href="#find-help"
+    className="hover:text-green-700"
+  >
+    Find Help
+  </a>
 
-            <button className="rounded-full bg-green-700 px-6 py-3 text-white hover:bg-green-800">
-              Need Help?
-            </button>
+  {/* Donate */}
+  <a
+    href="#donate"
+    className="hover:text-green-700"
+  >
+    Donate
+  </a>
 
-          </nav>
+  {/* Need Help */}
+  <button
+    className="rounded-full bg-green-700 px-6 py-3 text-white hover:bg-green-800"
+  >
+    Need Help?
+  </button>
+
+</nav>
 
         </div>
       </header>
