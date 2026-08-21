@@ -4,7 +4,7 @@ function Login() {
   const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* ================= NAVBAR ================= */}
+      {/* NAVBAR */}
       <header className="bg-white shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           {/* Logo */}
@@ -28,7 +28,7 @@ function Login() {
         </div>
       </header>
 
-      {/* ================= LOGIN SECTION ================= */}
+      {/* LOGIN SECTION */}
       <main className="flex min-h-[calc(100vh-180px)] items-center justify-center px-6 py-12">
         <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-lg">
           {/* Heading */}
@@ -129,7 +129,7 @@ function Login() {
         </div>
       </main>
 
-      {/* ================= FOOTER ================= */}
+      {/* FOOTER */}
       <footer className="bg-gray-950 px-6 py-8 text-center text-gray-300">
         <p>© 2026 ShelterLink. All rights reserved.</p>
       </footer>

@@ -2,7 +2,7 @@ function Donate() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* ================= NAVBAR ================= */}
+      {/* NAVBAR */}
       <header className="bg-white shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
 
@@ -27,7 +27,7 @@ function Donate() {
       </header>
 
 
-      {/* ================= DONATE CONTENT ================= */}
+      {/* DONATE CONTENT */}
       <main className="px-6 py-16">
 
         <div className="mx-auto max-w-5xl">
@@ -125,7 +125,7 @@ function Donate() {
       </main>
 
 
-      {/* ================= FOOTER ================= */}
+      {/* FOOTER */}
       <footer className="bg-gray-950 px-6 py-10 text-center text-gray-300">
 
         <h2 className="text-3xl font-black text-white">
