@@ -1,6 +1,9 @@
 import heroImage from "../assets/shelter.jpeg";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-white text-gray-900">
 
@@ -301,7 +304,9 @@ function Home() {
             and other essential services to people in need.
           </p>
 
-          <button className="mt-8 rounded-full bg-white px-8 py-4 font-semibold text-green-800 hover:bg-gray-100">
+          <button 
+          onClick={() => navigate("/donate")}
+          className="mt-8 rounded-full bg-white px-8 py-4 font-semibold text-green-800 hover:bg-gray-100">
             Donate Now
           </button>
 
