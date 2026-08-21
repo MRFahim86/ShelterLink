@@ -274,7 +274,7 @@ function Home() {
                 Find Help
               </a>
 
-              <a href="#donate" className="hover:text-white">
+              <a href="/Donate" className="hover:text-white">
                 Donate
               </a>
             </div>
