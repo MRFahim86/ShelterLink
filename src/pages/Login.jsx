@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* NAVBAR */}
@@ -37,7 +38,9 @@ function Login() {
               Welcome Back
             </p>
 
-            <h2 className="mt-2 text-4xl font-bold text-gray-900">Login</h2>
+            <h2 className="mt-2 text-4xl font-bold text-gray-900">
+              Login
+            </h2>
 
             <p className="mt-3 text-gray-600">
               Login to your ShelterLink account to continue.
@@ -49,7 +52,7 @@ function Login() {
             className="mt-8"
             onSubmit={(e) => {
               e.preventDefault();
-              navigate("/");
+              navigate("/user");
             }}
           >
             {/* Email */}
@@ -64,6 +67,7 @@ function Login() {
               <input
                 id="email"
                 type="email"
+                required
                 placeholder="Enter your email address"
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
               />
@@ -81,19 +85,10 @@ function Login() {
               <input
                 id="password"
                 type="password"
+                required
                 placeholder="Enter your password"
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
               />
-            </div>
-
-            {/* Forgot Password */}
-            <div className="mt-3 text-right">
-              <Link
-                to="#"
-                className="text-sm font-semibold text-green-700 hover:text-green-800"
-              >
-                Forgot Password?
-              </Link>
             </div>
 
             {/* Login Button */}
