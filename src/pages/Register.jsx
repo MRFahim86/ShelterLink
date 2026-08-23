@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 
-function Login() {
+function Register() {
   const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,32 +28,51 @@ function Login() {
         </div>
       </header>
 
-      {/* LOGIN SECTION */}
+      {/* REGISTRATION SECTION */}
       <main className="flex min-h-[calc(100vh-180px)] items-center justify-center px-6 py-12">
         <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-lg">
           {/* Heading */}
           <div className="text-center">
             <p className="font-semibold uppercase tracking-wider text-green-700">
-              Welcome Back
+              Join ShelterLink
             </p>
 
-            <h2 className="mt-2 text-4xl font-bold text-gray-900">Login</h2>
+            <h2 className="mt-2 text-4xl font-bold text-gray-900">
+              Create Account
+            </h2>
 
             <p className="mt-3 text-gray-600">
-              Login to your ShelterLink account to continue.
+              Register to access ShelterLink services and support.
             </p>
           </div>
 
-          {/* Login Form */}
+          {/* Registration Form */}
           <form
             className="mt-8"
             onSubmit={(e) => {
               e.preventDefault();
-              navigate("/");
+              navigate("/login");
             }}
           >
-            {/* Email */}
+            {/* Full Name */}
             <div>
+              <label
+                htmlFor="fullName"
+                className="mb-2 block font-semibold text-gray-700"
+              >
+                Full Name
+              </label>
+
+              <input
+                id="fullName"
+                type="text"
+                placeholder="Enter your full name"
+                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
+              />
+            </div>
+
+            {/* Email */}
+            <div className="mt-5">
               <label
                 htmlFor="email"
                 className="mb-2 block font-semibold text-gray-700"
@@ -81,49 +100,56 @@ function Login() {
               <input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Create a password"
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
               />
             </div>
 
-            {/* Forgot Password */}
-            <div className="mt-3 text-right">
-              <Link
-                to="#"
-                className="text-sm font-semibold text-green-700 hover:text-green-800"
+            {/* Confirm Password */}
+            <div className="mt-5">
+              <label
+                htmlFor="confirmPassword"
+                className="mb-2 block font-semibold text-gray-700"
               >
-                Forgot Password?
-              </Link>
+                Confirm Password
+              </label>
+
+              <input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
+              />
             </div>
 
-            {/* Login Button */}
+            {/* Register Button */}
             <button
               type="submit"
-              className="mt-6 w-full rounded-full bg-green-700 px-6 py-4 font-semibold text-white transition hover:bg-green-800"
+              className="mt-7 w-full rounded-full bg-green-700 px-6 py-4 font-semibold text-white transition hover:bg-green-800"
             >
-              Login
+              Register
             </button>
           </form>
 
-          {/* Register */}
+          {/* Login */}
           <div className="mt-7 border-t border-gray-200 pt-6 text-center">
-            <p className="text-gray-600">Don't have an account?</p>
+            <p className="text-gray-600">Already have an account?</p>
 
             <Link
-              to="/register"
+              to="/login"
               className="mt-3 inline-block rounded-full border-2 border-green-700 px-7 py-3 font-semibold text-green-700 transition hover:bg-green-700 hover:text-white"
             >
-              Register
+              Login
             </Link>
           </div>
 
-          {/* Back to Donate */}
+          {/* Back to Home */}
           <div className="mt-6 text-center">
             <Link
-              to="/donate"
+              to="/"
               className="text-sm font-semibold text-gray-500 hover:text-green-700"
             >
-              ← Back to Donate
+              ← Back to Home
             </Link>
           </div>
         </div>
@@ -137,4 +163,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;

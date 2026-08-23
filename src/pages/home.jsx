@@ -6,7 +6,7 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      {/* ================= NAVBAR ================= */}
+      {/* NAVBAR */}
       <header className="bg-white shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           {/* Logo */}
@@ -60,7 +60,7 @@ function Home() {
         </div>
       </header>
 
-      {/* ================= HERO ================= */}
+      {/* HERO */}
       <section id="home" className="relative min-h-[600px] overflow-hidden">
         <img
           src={heroImage}
@@ -99,7 +99,7 @@ function Home() {
         </div>
       </section>
 
-      {/* ================= SERVICES ================= */}
+      {/* SERVICES */}
       <section id="services" className="bg-gray-50 px-6 py-20">
         <div className="mx-auto max-w-7xl">
           <div className="text-center">
@@ -189,7 +189,7 @@ function Home() {
         </div>
       </section>
 
-      {/* ================= FIND HELP ================= */}
+      {/* FIND HELP */}
       <section id="find-help" className="px-6 py-20">
         <div className="mx-auto grid max-w-7xl items-center gap-12 md:grid-cols-2">
           <div>
@@ -231,7 +231,7 @@ function Home() {
         </div>
       </section>
 
-      {/* ================= DONATE ================= */}
+      {/* DONATE */}
       <section
         id="donate"
         className="bg-green-800 px-6 py-20 text-center text-white"
@@ -253,7 +253,7 @@ function Home() {
         </div>
       </section>
 
-      {/* ================= FOOTER ================= */}
+      {/* FOOTER */}
       <footer className="bg-gray-950 px-6 py-12 text-gray-300">
         <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-3">
           <div>
@@ -282,7 +282,7 @@ function Home() {
                 Find Help
               </a>
 
-              <a href="#donate" className="hover:text-white">
+              <a href="/Donate" className="hover:text-white">
                 Donate
               </a>
             </div>
