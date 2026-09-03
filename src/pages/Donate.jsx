@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Donate() {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -16,12 +18,12 @@ function Donate() {
             </p>
           </div>
 
-          <a
-            href="/"
+          <Link
+            to="/"
             className="rounded-full px-6 py-3 font-semibold text-gray-700 hover:bg-gray-100"
           >
             Back to Home
-          </a>
+          </Link>
 
         </div>
       </header>
@@ -111,12 +113,12 @@ function Donate() {
               Please log in before continuing with your donation.
             </p>
 
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="mt-8 inline-block rounded-full bg-white px-10 py-4 font-semibold text-green-800 hover:bg-gray-100"
             >
               Continue to Login
-            </a>
+            </Link>
 
           </div>
 
