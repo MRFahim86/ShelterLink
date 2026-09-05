@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
+import userRoute from "./routes/userRoute.js";
 import authRoute from "./routes/authRoute.js";
 
 dotenv.config();
@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
 
 
 app.use("/auth", authRoute);
-
+app.use("/user", userRoute);
 
 // Port
 const PORT = process.env.PORT || 4000;

@@ -2,6 +2,8 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+// ==================== LOGIN ====================
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -54,6 +56,7 @@ export const login = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000
     });
 
+    // Send response
     res.status(200).json({
       message: "Login successful",
       user: {
@@ -71,6 +74,9 @@ export const login = async (req, res) => {
     });
   }
 };
+
+
+// ==================== REGISTER ====================
 
 export const register = async (req, res) => {
   try {
@@ -119,4 +125,19 @@ export const register = async (req, res) => {
       message: "Server error"
     });
   }
+};
+
+
+// ==================== LOGOUT ====================
+
+export const logout = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax"
+  });
+
+  res.status(200).json({
+    message: "Logout successful"
+  });
 };
