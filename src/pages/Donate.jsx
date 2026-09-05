@@ -1,148 +1,488 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 function Donate() {
+  const [amount, setAmount] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  // Quick donation amounts
+  const quickAmounts = [100, 500, 1000];
+
+  // Select quick amount
+  const handleQuickAmount = (value) => {
+    setAmount(value.toString());
+    setError("");
+  };
+
+  // Form input change
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+
+    setError("");
+  };
+
+  // Submit donation
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const donationAmount = Number(amount);
+
+    // Amount validation
+    if (!amount || donationAmount <= 0) {
+      setError("Please enter a valid donation amount.");
+      return;
+    }
+
+    // Purpose validation
+    if (!purpose) {
+      setError("Please select a donation purpose.");
+      return;
+    }
+
+    // Name validation
+    if (!formData.name.trim()) {
+      setError("Please enter your name.");
+      return;
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      setError("Please enter your email.");
+      return;
+    }
+
+    // Simple email validation
+    if (!formData.email.includes("@")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    // Phone validation
+    if (!formData.phone.trim()) {
+      setError("Please enter your phone number.");
+      return;
+    }
+
+    // Success
+    setError("");
+    setSuccess(true);
+  };
+
+  // Reset form
+  const handleReset = () => {
+    setAmount("");
+    setPurpose("");
+
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+    });
+
+    setError("");
+    setSuccess(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* NAVBAR */}
-      <header className="bg-white shadow-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+      {/* ================= HEADER ================= */}
 
-          <div>
-            <h1 className="text-4xl font-black tracking-tight">
-              Shelter<span className="text-green-700">Link</span>
-            </h1>
+      <header className="bg-white border-b">
 
-            <p className="text-sm italic text-gray-500">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+
+          {/* Logo */}
+
+          <Link to="/" className="block">
+
+            <div className="text-3xl font-bold tracking-tight">
+              <span className="text-black">Shelter</span>
+              <span className="text-green-700">Link</span>
+            </div>
+
+            <p className="text-sm text-gray-500 italic">
               connecting people to safety, shelter and support
             </p>
-          </div>
+
+          </Link>
+
+          {/* Back */}
 
           <Link
             to="/"
-            className="rounded-full px-6 py-3 font-semibold text-gray-700 hover:bg-gray-100"
+            className="text-gray-800 font-semibold hover:text-green-700"
           >
             Back to Home
           </Link>
 
         </div>
+
       </header>
 
+      {/* ================= HERO ================= */}
 
-      {/* DONATE CONTENT */}
-      <main className="px-6 py-16">
+      <section className="text-center py-16 px-6">
 
-        <div className="mx-auto max-w-5xl">
-
-          <div className="text-center">
-
-            <p className="font-semibold uppercase tracking-wider text-green-700">
-              Make a Difference
-            </p>
-
-            <h2 className="mt-3 text-5xl font-bold text-gray-900">
-              Support Someone in Need
-            </h2>
-
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-gray-600">
-              Your contribution can help provide food, shelter, healthcare
-              and essential support to people in vulnerable situations.
-            </p>
-
-          </div>
-
-
-          {/* Donation Options */}
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-
-            <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
-                🍲
-              </div>
-
-              <h3 className="mt-5 text-xl font-bold">
-                Provide Food
-              </h3>
-
-              <p className="mt-3 text-gray-600">
-                Help provide nutritious meals to people who need them.
-              </p>
-            </div>
-
-
-            <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
-                🏠
-              </div>
-
-              <h3 className="mt-5 text-xl font-bold">
-                Support Shelter
-              </h3>
-
-              <p className="mt-3 text-gray-600">
-                Help people access safe and temporary accommodation.
-              </p>
-            </div>
-
-
-            <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
-                🏥
-              </div>
-
-              <h3 className="mt-5 text-xl font-bold">
-                Medical Support
-              </h3>
-
-              <p className="mt-3 text-gray-600">
-                Help provide essential healthcare and medical assistance.
-              </p>
-            </div>
-
-          </div>
-
-
-          {/* Donation Action */}
-          <div className="mt-12 rounded-3xl bg-green-800 px-6 py-12 text-center text-white">
-
-            <h3 className="text-3xl font-bold">
-              Ready to make a difference?
-            </h3>
-
-            <p className="mx-auto mt-4 max-w-xl text-green-100">
-              Please log in before continuing with your donation.
-            </p>
-
-            <Link
-              to="/login"
-              className="mt-8 inline-block rounded-full bg-white px-10 py-4 font-semibold text-green-800 hover:bg-gray-100"
-            >
-              Continue to Login
-            </Link>
-
-          </div>
-
-        </div>
-
-      </main>
-
-
-      {/* FOOTER */}
-      <footer className="bg-gray-950 px-6 py-10 text-center text-gray-300">
-
-        <h2 className="text-3xl font-black text-white">
-          Shelter<span className="text-green-500">Link</span>
-        </h2>
-
-        <p className="mt-3">
-          Connecting people to safety, shelter and support.
+        <p className="text-green-700 font-bold tracking-wide text-lg">
+          MAKE A DIFFERENCE
         </p>
 
-        <div className="mt-6 border-t border-gray-800 pt-6 text-sm">
-          © 2026 ShelterLink. All rights reserved.
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4">
+          Support Someone in Need
+        </h1>
+
+        <p className="text-gray-600 text-lg max-w-3xl mx-auto mt-5 leading-relaxed">
+          Your contribution can help provide food, shelter, healthcare and
+          essential support to people in vulnerable situations.
+        </p>
+
+      </section>
+
+      {/* ================= DONATION TYPES ================= */}
+
+      <section className="max-w-6xl mx-auto px-6">
+
+        <div className="grid md:grid-cols-3 gap-6">
+
+          {/* Food */}
+
+          <button
+            type="button"
+            onClick={() => setPurpose("Food")}
+            className={`bg-white rounded-2xl border p-8 text-center shadow-sm transition hover:shadow-md ${
+              purpose === "Food"
+                ? "border-green-600 ring-2 ring-green-200"
+                : "border-gray-200"
+            }`}
+          >
+
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-3xl">
+              🍲
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-900 mt-6">
+              Provide Food
+            </h2>
+
+            <p className="text-gray-600 mt-4 leading-relaxed">
+              Help provide nutritious meals to people who need them.
+            </p>
+
+          </button>
+
+          {/* Shelter */}
+
+          <button
+            type="button"
+            onClick={() => setPurpose("Shelter")}
+            className={`bg-white rounded-2xl border p-8 text-center shadow-sm transition hover:shadow-md ${
+              purpose === "Shelter"
+                ? "border-green-600 ring-2 ring-green-200"
+                : "border-gray-200"
+            }`}
+          >
+
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-3xl">
+              🏠
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-900 mt-6">
+              Support Shelter
+            </h2>
+
+            <p className="text-gray-600 mt-4 leading-relaxed">
+              Help people access safe and temporary accommodation.
+            </p>
+
+          </button>
+
+          {/* Medical */}
+
+          <button
+            type="button"
+            onClick={() => setPurpose("Medical")}
+            className={`bg-white rounded-2xl border p-8 text-center shadow-sm transition hover:shadow-md ${
+              purpose === "Medical"
+                ? "border-green-600 ring-2 ring-green-200"
+                : "border-gray-200"
+            }`}
+          >
+
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-3xl">
+              🏥
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-900 mt-6">
+              Medical Support
+            </h2>
+
+            <p className="text-gray-600 mt-4 leading-relaxed">
+              Help provide essential healthcare and medical assistance.
+            </p>
+
+          </button>
+
         </div>
 
-      </footer>
+      </section>
+
+      {/* ================= DONATION FORM ================= */}
+
+      <section className="max-w-6xl mx-auto px-6 py-12">
+
+        <div className="bg-green-800 rounded-3xl p-8 md:p-12">
+
+          {!success ? (
+
+            <>
+
+              <div className="text-center text-white mb-8">
+
+                <h2 className="text-3xl font-bold">
+                  Ready to make a difference?
+                </h2>
+
+                <p className="mt-3 text-green-100">
+                  Choose your donation amount and fill in your information.
+                </p>
+
+              </div>
+
+              <form
+                onSubmit={handleSubmit}
+                className="bg-white rounded-2xl p-6 md:p-8 max-w-2xl mx-auto"
+              >
+
+                {/* Donation Purpose */}
+
+                <label className="block font-semibold text-gray-800 mb-2">
+                  Donation Purpose
+                </label>
+
+                <select
+                  value={purpose}
+                  onChange={(e) => {
+                    setPurpose(e.target.value);
+                    setError("");
+                  }}
+                  className="w-full border rounded-lg px-4 py-3 mb-6 outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="">
+                    Select purpose
+                  </option>
+
+                  <option value="Food">
+                    Provide Food
+                  </option>
+
+                  <option value="Shelter">
+                    Support Shelter
+                  </option>
+
+                  <option value="Medical">
+                    Medical Support
+                  </option>
+
+                </select>
+
+                {/* Amount */}
+
+                <label className="block font-semibold text-gray-800 mb-3">
+                  Donation Amount
+                </label>
+
+                <div className="grid grid-cols-3 gap-3 mb-4">
+
+                  {quickAmounts.map((value) => (
+
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => handleQuickAmount(value)}
+                      className={`py-3 rounded-lg font-bold border transition ${
+                        amount === value.toString()
+                          ? "bg-green-700 text-white border-green-700"
+                          : "bg-white text-green-700 border-green-300 hover:bg-green-50"
+                      }`}
+                    >
+                      ৳{value}
+                    </button>
+
+                  ))}
+
+                </div>
+
+                {/* Custom amount */}
+
+                <input
+                  type="number"
+                  min="1"
+                  placeholder="Enter custom amount"
+                  value={amount}
+                  onChange={(e) => {
+                    setAmount(e.target.value);
+                    setError("");
+                  }}
+                  className="w-full border rounded-lg px-4 py-3 mb-6 outline-none focus:ring-2 focus:ring-green-500"
+                />
+
+                {/* Name */}
+
+                <label className="block font-semibold text-gray-800 mb-2">
+                  Full Name
+                </label>
+
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Enter your name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg px-4 py-3 mb-5 outline-none focus:ring-2 focus:ring-green-500"
+                />
+
+                {/* Email */}
+
+                <label className="block font-semibold text-gray-800 mb-2">
+                  Email Address
+                </label>
+
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg px-4 py-3 mb-5 outline-none focus:ring-2 focus:ring-green-500"
+                />
+
+                {/* Phone */}
+
+                <label className="block font-semibold text-gray-800 mb-2">
+                  Phone Number
+                </label>
+
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Enter your phone number"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg px-4 py-3 mb-5 outline-none focus:ring-2 focus:ring-green-500"
+                />
+
+                {/* Error */}
+
+                {error && (
+
+                  <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-5 text-sm">
+                    ⚠️ {error}
+                  </div>
+
+                )}
+
+                {/* Selected donation summary */}
+
+                {amount && purpose && (
+
+                  <div className="bg-green-50 rounded-lg p-4 mb-5">
+
+                    <p className="text-gray-700">
+                      Donation:
+                      <span className="font-bold ml-2">
+                        ৳{amount}
+                      </span>
+                    </p>
+
+                    <p className="text-gray-700 mt-1">
+                      Purpose:
+                      <span className="font-bold ml-2">
+                        {purpose}
+                      </span>
+                    </p>
+
+                  </div>
+
+                )}
+
+                {/* Submit */}
+
+                <button
+                  type="submit"
+                  className="w-full bg-green-700 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-800 transition"
+                >
+                  Donate Now
+                </button>
+
+              </form>
+
+            </>
+
+          ) : (
+
+            /* ================= SUCCESS ================= */
+
+            <div className="bg-white rounded-2xl p-10 text-center max-w-2xl mx-auto">
+
+              <div className="text-6xl mb-5">
+                🎉
+              </div>
+
+              <h2 className="text-3xl font-bold text-green-700">
+                Thank You!
+              </h2>
+
+              <p className="text-gray-700 text-lg mt-4">
+                Your donation request has been recorded successfully.
+              </p>
+
+              <div className="bg-green-50 rounded-xl p-5 mt-6 text-left">
+
+                <p className="text-gray-700">
+                  <strong>Amount:</strong> ৳{amount}
+                </p>
+
+                <p className="text-gray-700 mt-2">
+                  <strong>Purpose:</strong> {purpose}
+                </p>
+
+                <p className="text-gray-700 mt-2">
+                  <strong>Donor:</strong> {formData.name}
+                </p>
+
+              </div>
+
+              <p className="text-gray-500 text-sm mt-5">
+                In the final version, this donation can be connected to
+                a payment gateway and backend database.
+              </p>
+
+              <button
+                onClick={handleReset}
+                className="mt-6 bg-green-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-800"
+              >
+                Make Another Donation
+              </button>
+
+            </div>
+
+          )}
+
+        </div>
+
+      </section>
 
     </div>
   );
