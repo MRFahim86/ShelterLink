@@ -1,15 +1,57 @@
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function User() {
   const navigate = useNavigate();
 
+  const [user, setUser] = useState(null);
+  const [message, setMessage] = useState("");
+
+  // Get logged-in user's information
+  useEffect(() => {
+    const getUserProfile = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/user/profile", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setUser(data.user);
+        } else {
+          setMessage(data.message);
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error("Profile error:", error);
+        setMessage("Cannot connect to server");
+      }
+    };
+
+    getUserProfile();
+  }, [navigate]);
+
+  // Logout
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:4000/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      navigate("/login");
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-50">
-
       {/* ================= NAVBAR ================= */}
       <header className="bg-white shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-
           {/* Logo */}
           <div>
             <h1 className="text-4xl font-black tracking-tight">
@@ -23,7 +65,6 @@ function User() {
 
           {/* Navigation */}
           <nav className="flex items-center gap-4">
-
             <Link
               to="/"
               className="rounded-full px-6 py-3 font-semibold text-gray-700 hover:bg-gray-100"
@@ -32,81 +73,59 @@ function User() {
             </Link>
 
             <button
-              onClick={() => navigate("/login")}
+              onClick={handleLogout}
               className="rounded-full bg-green-700 px-6 py-3 font-semibold text-white hover:bg-green-800"
             >
               Logout
             </button>
-
           </nav>
-
         </div>
       </header>
 
-
       {/* ================= USER PROFILE ================= */}
       <main className="mx-auto max-w-7xl px-6 py-12">
-
         {/* Welcome */}
         <div className="rounded-3xl bg-green-800 p-8 text-white shadow-lg">
-
           <p className="font-semibold uppercase tracking-wider text-green-200">
             Welcome to ShelterLink
           </p>
 
           <h2 className="mt-2 text-4xl font-bold">
-            Hello, User!
+            Hello, {user ? user.name : "User"}!
           </h2>
 
           <p className="mt-3 max-w-2xl text-green-100">
             Manage your account and access ShelterLink services from your
             personal dashboard.
           </p>
-
         </div>
-
 
         {/* ================= PROFILE & QUICK ACTIONS ================= */}
         <div className="mt-8 grid gap-8 md:grid-cols-3">
-
           {/* Profile */}
           <div className="rounded-3xl bg-white p-8 shadow-sm">
-
             <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-green-100 text-5xl">
               👤
             </div>
 
             <div className="mt-6 text-center">
-
               <h3 className="text-2xl font-bold text-gray-900">
-                User Name
+                {user ? user.name : "Loading..."}
               </h3>
 
               <p className="mt-2 text-gray-600">
-                user@example.com
+                {user ? user.email : "Loading..."}
               </p>
-
             </div>
-
-            <button
-              className="mt-6 w-full rounded-full border-2 border-green-700 px-6 py-3 font-semibold text-green-700 hover:bg-green-700 hover:text-white"
-            >
-              Edit Profile
-            </button>
-
           </div>
-
 
           {/* Find Help */}
           <div className="rounded-3xl bg-white p-8 shadow-sm">
-
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
               🆘
             </div>
 
-            <h3 className="mt-5 text-2xl font-bold">
-              Find Help
-            </h3>
+            <h3 className="mt-5 text-2xl font-bold">Find Help</h3>
 
             <p className="mt-3 text-gray-600">
               Find nearby shelters, food providers, healthcare services and
@@ -119,20 +138,15 @@ function User() {
             >
               Find Support
             </Link>
-
           </div>
-
 
           {/* Donate */}
           <div className="rounded-3xl bg-white p-8 shadow-sm">
-
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
               ❤️
             </div>
 
-            <h3 className="mt-5 text-2xl font-bold">
-              Support Others
-            </h3>
+            <h3 className="mt-5 text-2xl font-bold">Support Others</h3>
 
             <p className="mt-3 text-gray-600">
               Your contribution can help provide food, shelter, medicine and
@@ -145,28 +159,19 @@ function User() {
             >
               Donate Now
             </Link>
-
           </div>
-
         </div>
-
 
         {/* ================= ACCOUNT INFORMATION ================= */}
         <section className="mt-8 rounded-3xl bg-white p-8 shadow-sm">
-
-          <h3 className="text-2xl font-bold">
-            Account Information
-          </h3>
+          <h3 className="text-2xl font-bold">Account Information</h3>
 
           <div className="mt-6 grid gap-6 md:grid-cols-2">
-
             <div>
-              <p className="text-sm font-semibold text-gray-500">
-                Full Name
-              </p>
+              <p className="text-sm font-semibold text-gray-500">Full Name</p>
 
               <p className="mt-1 text-lg font-semibold text-gray-900">
-                User Name
+                {user ? user.name : "Loading..."}
               </p>
             </div>
 
@@ -176,7 +181,7 @@ function User() {
               </p>
 
               <p className="mt-1 text-lg font-semibold text-gray-900">
-                user@example.com
+                {user ? user.email : "Loading..."}
               </p>
             </div>
 
@@ -196,26 +201,24 @@ function User() {
               </p>
 
               <p className="mt-1 text-lg font-semibold text-gray-900">
-                2026
+                {user ? new Date(user.createdAt).getFullYear() : "Loading..."}
               </p>
             </div>
-
           </div>
-
         </section>
 
+        {/* Error message */}
+        {message && (
+          <p className="mt-6 text-center font-semibold text-red-600">
+            {message}
+          </p>
+        )}
       </main>
-
 
       {/* ================= FOOTER ================= */}
       <footer className="bg-gray-950 px-6 py-8 text-center text-gray-300">
-
-        <p>
-          © 2026 ShelterLink. All rights reserved.
-        </p>
-
+        <p>© 2026 ShelterLink. All rights reserved.</p>
       </footer>
-
     </div>
   );
 }

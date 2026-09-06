@@ -1,7 +1,72 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function Register() {
   const navigate = useNavigate();
+
+  // Store form data
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+
+  const [message, setMessage] = useState("");
+
+  // Handle input changes
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // Handle registration
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Check passwords
+    if (formData.password !== formData.confirmPassword) {
+      setMessage("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "http://localhost:4000/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("Registration successful!");
+
+        // Go to login after successful registration
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+      } else {
+        setMessage(data.message);
+      }
+
+    } catch (error) {
+      console.error("Registration error:", error);
+      setMessage("Cannot connect to server");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* NAVBAR */}
@@ -47,26 +112,25 @@ function Register() {
           </div>
 
           {/* Registration Form */}
-          <form
-            className="mt-8"
-            onSubmit={(e) => {
-              e.preventDefault();
-              navigate("/login");
-            }}
-          >
+          <form className="mt-8" onSubmit={handleSubmit}>
+
             {/* Full Name */}
             <div>
               <label
-                htmlFor="fullName"
+                htmlFor="name"
                 className="mb-2 block font-semibold text-gray-700"
               >
                 Full Name
               </label>
 
               <input
-                id="fullName"
+                id="name"
+                name="name"
                 type="text"
                 placeholder="Enter your full name"
+                value={formData.name}
+                onChange={handleChange}
+                required
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
               />
             </div>
@@ -82,8 +146,12 @@ function Register() {
 
               <input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="Enter your email address"
+                value={formData.email}
+                onChange={handleChange}
+                required
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
               />
             </div>
@@ -99,8 +167,12 @@ function Register() {
 
               <input
                 id="password"
+                name="password"
                 type="password"
                 placeholder="Create a password"
+                value={formData.password}
+                onChange={handleChange}
+                required
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
               />
             </div>
@@ -116,11 +188,22 @@ function Register() {
 
               <input
                 id="confirmPassword"
+                name="confirmPassword"
                 type="password"
                 placeholder="Confirm your password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
               />
             </div>
+
+            {/* Message */}
+            {message && (
+              <p className="mt-4 text-center font-semibold text-green-700">
+                {message}
+              </p>
+            )}
 
             {/* Register Button */}
             <button

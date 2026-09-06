@@ -11,7 +11,7 @@ export const login = async (req, res) => {
     // Check input
     if (!email || !password) {
       return res.status(400).json({
-        message: "Email and password are required"
+        message: "Email and password are required",
       });
     }
 
@@ -20,19 +20,16 @@ export const login = async (req, res) => {
 
     if (!user) {
       return res.status(401).json({
-        message: "Invalid email or password"
+        message: "Invalid email or password",
       });
     }
 
     // Check password
-    const passwordMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       return res.status(401).json({
-        message: "Invalid email or password"
+        message: "Invalid email or password",
       });
     }
 
@@ -40,12 +37,14 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       {
         id: user._id,
-        email: user.email
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1d"
-      }
+        expiresIn: "1d",
+      },
     );
 
     // Send token in cookie
@@ -53,7 +52,7 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     // Send response
@@ -62,19 +61,17 @@ export const login = async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
-      }
+        email: user.email,
+      },
     });
-
   } catch (error) {
     console.log("Login error:", error.message);
 
     res.status(500).json({
-      message: "Server error"
+      message: "Server error",
     });
   }
 };
-
 
 // ==================== REGISTER ====================
 
@@ -85,7 +82,7 @@ export const register = async (req, res) => {
     // Check input
     if (!name || !email || !password) {
       return res.status(400).json({
-        message: "Name, email and password are required"
+        message: "Name, email and password are required",
       });
     }
 
@@ -94,7 +91,7 @@ export const register = async (req, res) => {
 
     if (existingUser) {
       return res.status(409).json({
-        message: "Email already registered"
+        message: "Email already registered",
       });
     }
 
@@ -105,7 +102,7 @@ export const register = async (req, res) => {
     const user = await User.create({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     // Send response
@@ -114,19 +111,17 @@ export const register = async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
-      }
+        email: user.email,
+      },
     });
-
   } catch (error) {
     console.log("Registration error:", error.message);
 
     res.status(500).json({
-      message: "Server error"
+      message: "Server error",
     });
   }
 };
-
 
 // ==================== LOGOUT ====================
 
@@ -134,10 +129,10 @@ export const logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: false,
-    sameSite: "lax"
+    sameSite: "lax",
   });
 
   res.status(200).json({
-    message: "Logout successful"
+    message: "Logout successful",
   });
 };
