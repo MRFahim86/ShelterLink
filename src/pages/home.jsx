@@ -1,8 +1,98 @@
 import heroImage from "../assets/shelter.jpeg";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+// Fix Leaflet default marker icon
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+});
+
+// Move map when position changes
+function ChangeMapView({ position }) {
+  const map = useMap();
+
+  map.setView(position, 14);
+
+  return null;
+}
 
 function Home() {
   const navigate = useNavigate();
+
+  // ================= LOCATION STATES =================
+  const [location, setLocation] = useState("");
+
+  // Default location = Dhaka
+  const [position, setPosition] = useState([23.8103, 90.4125]);
+
+  const [locationName, setLocationName] = useState("Dhaka");
+
+  // ================= SEARCH LOCATION =================
+  const handleSearch = async () => {
+    // If input is empty, use current location
+    if (!location.trim()) {
+      getCurrentLocation();
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          location
+        )}&limit=1`
+      );
+
+      const data = await response.json();
+
+      if (data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+
+        setPosition([lat, lon]);
+        setLocationName(data[0].display_name);
+      } else {
+        alert("Location not found. Please try another location.");
+      }
+    } catch (error) {
+      console.error("Location search error:", error);
+      alert("Unable to search location. Please try again.");
+    }
+  };
+
+  // ================= CURRENT LOCATION =================
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (currentPosition) => {
+        const lat = currentPosition.coords.latitude;
+        const lon = currentPosition.coords.longitude;
+
+        setPosition([lat, lon]);
+        setLocationName("Your Current Location");
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+
+        alert(
+          "Unable to get your current location. Please allow location permission or enter a location manually."
+        );
+      }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
@@ -296,16 +386,24 @@ function Home() {
               organizations and other community resources.
             </p>
 
+            {/* ================= LOCATION SEARCH ================= */}
             <div className="mt-8 flex overflow-hidden rounded-full border shadow-sm">
 
               <input
                 type="text"
                 placeholder="Enter your location..."
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
                 className="flex-1 px-6 py-4 outline-none"
               />
 
               <button
-                onClick={() => navigate("/services")}
+                onClick={handleSearch}
                 className="bg-green-700 px-7 font-semibold text-white hover:bg-green-800"
               >
                 Search
@@ -316,23 +414,33 @@ function Home() {
           </div>
 
 
-          <div className="flex h-80 items-center justify-center rounded-3xl bg-gray-200">
+          {/* ================= INTERACTIVE MAP ================= */}
+          <div className="h-80 overflow-hidden rounded-3xl bg-gray-200">
 
-            <div className="text-center">
+            <MapContainer
+              center={position}
+              zoom={13}
+              scrollWheelZoom={true}
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+            >
 
-              <div className="text-6xl">
-                📍
-              </div>
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
 
-              <h3 className="mt-3 text-xl font-bold">
-                Find Services Near You
-              </h3>
+              <ChangeMapView position={position} />
 
-              <p className="mt-2 text-gray-500">
-                Interactive map will be added later.
-              </p>
+              <Marker position={position}>
+                <Popup>
+                  <strong>{locationName}</strong>
+                </Popup>
+              </Marker>
 
-            </div>
+            </MapContainer>
 
           </div>
 
