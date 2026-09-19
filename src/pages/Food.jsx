@@ -1,21 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 function Food() {
-  const foodProviders = [
+  const initialProviders = [
     {
+      id: 1,
       name: "Community Food Bank",
       location: "Dhanmondi, Dhaka",
       meals: 50,
       type: "Food Bank",
     },
     {
+      id: 2,
       name: "Hope Kitchen",
       location: "Mohammadpur, Dhaka",
       meals: 35,
       type: "Free Meals",
     },
     {
+      id: 3,
       name: "Helping Hands",
       location: "Mirpur, Dhaka",
       meals: 25,
@@ -23,44 +26,110 @@ function Food() {
     },
   ];
 
-  // Search
-  const [search, setSearch] = useState("");
-  const [searchLocation, setSearchLocation] = useState("");
+  // ================= FOOD PROVIDERS =================
 
-  // Food request modal
+  const [foodProviders, setFoodProviders] = useState(() => {
+    const saved = localStorage.getItem(
+      "shelterlink_food_providers"
+    );
+
+    return saved ? JSON.parse(saved) : initialProviders;
+  });
+
+  // Save updated meal availability
+  useEffect(() => {
+    localStorage.setItem(
+      "shelterlink_food_providers",
+      JSON.stringify(foodProviders)
+    );
+  }, [foodProviders]);
+
+  // ================= SEARCH =================
+
+  const [search, setSearch] = useState("");
+
+  const filteredProviders = foodProviders.filter((provider) => {
+    const searchText = search.toLowerCase().trim();
+
+    if (!searchText) {
+      return true;
+    }
+
+    return (
+      provider.name.toLowerCase().includes(searchText) ||
+      provider.location.toLowerCase().includes(searchText) ||
+      provider.type.toLowerCase().includes(searchText)
+    );
+  });
+
+  // ================= MODAL =================
+
   const [selectedProvider, setSelectedProvider] = useState(null);
 
-  // Request form
+  const [success, setSuccess] = useState(false);
+
+  // ================= FORM =================
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     meals: "1",
   });
 
-  // Success message
-  const [success, setSuccess] = useState(false);
+  // ================= MESSAGE =================
 
-  // Filter food providers
-  const filteredProviders = foodProviders.filter((provider) =>
-    provider.location.toLowerCase().includes(searchLocation.toLowerCase())
-  );
+  const [message, setMessage] = useState("");
 
-  // Search
+  // ================= SEARCH =================
+
   const handleSearch = () => {
-    setSearchLocation(search);
+    setSearch(search.trim());
   };
 
-  // Form input change
+  const clearSearch = () => {
+    setSearch("");
+  };
+
+  // ================= INPUT CHANGE =================
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    // Phone number: digits only
+    if (name === "phone") {
+      const numbersOnly = value.replace(/\D/g, "");
+
+      setFormData((previous) => ({
+        ...previous,
+        phone: numbersOnly,
+      }));
+
+      return;
+    }
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
   };
 
-  // Open request form
+  // ================= OPEN REQUEST =================
+
   const handleRequest = (provider) => {
+    if (provider.meals <= 0) {
+      setMessage(
+        "Sorry, this provider currently has no meals available."
+      );
+
+      setTimeout(() => {
+        setMessage("");
+      }, 4000);
+
+      return;
+    }
+
     setSelectedProvider(provider);
+
     setSuccess(false);
 
     setFormData({
@@ -70,10 +139,78 @@ function Food() {
     });
   };
 
-  // Submit request
+  // ================= SUBMIT REQUEST =================
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const numberOfMeals = Number(formData.meals);
+
+    // Validate name
+    if (!formData.name.trim()) {
+      alert("Please enter your full name.");
+      return;
+    }
+
+    // Validate phone
+    if (formData.phone.length < 10) {
+      alert("Please enter a valid phone number.");
+      return;
+    }
+
+    // Validate meal availability
+    if (numberOfMeals > selectedProvider.meals) {
+      alert(
+        `Only ${selectedProvider.meals} meal(s) are currently available.`
+      );
+
+      return;
+    }
+
+    // ================= CREATE REQUEST =================
+
+    const request = {
+      id: Date.now(),
+      name: formData.name,
+      phone: formData.phone,
+      meals: numberOfMeals,
+      provider: selectedProvider.name,
+      location: selectedProvider.location,
+      type: selectedProvider.type,
+      date: new Date().toLocaleString(),
+      status: "Pending",
+    };
+
+    // Get previous requests
+    const previousRequests = JSON.parse(
+      localStorage.getItem(
+        "shelterlink_food_requests"
+      ) || "[]"
+    );
+
+    // Add new request
+    previousRequests.push(request);
+
+    // Save request
+    localStorage.setItem(
+      "shelterlink_food_requests",
+      JSON.stringify(previousRequests)
+    );
+
+    // ================= UPDATE MEALS =================
+
+    setFoodProviders((previous) =>
+      previous.map((provider) =>
+        provider.id === selectedProvider.id
+          ? {
+              ...provider,
+              meals: provider.meals - numberOfMeals,
+            }
+          : provider
+      )
+    );
+
+    // Show success
     setSuccess(true);
 
     setFormData({
@@ -83,7 +220,8 @@ function Food() {
     });
   };
 
-  // Close modal
+  // ================= CLOSE MODAL =================
+
   const closeModal = () => {
     setSelectedProvider(null);
     setSuccess(false);
@@ -92,7 +230,8 @@ function Food() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Header */}
+      {/* ================= HEADER ================= */}
+
       <header className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
 
@@ -113,7 +252,16 @@ function Food() {
         </div>
       </header>
 
-      {/* Hero */}
+      {/* ================= MESSAGE ================= */}
+
+      {message && (
+        <div className="fixed top-5 right-5 z-50 bg-orange-600 text-white px-6 py-4 rounded-lg shadow-lg">
+          {message}
+        </div>
+      )}
+
+      {/* ================= HERO ================= */}
+
       <section className="bg-orange-50 py-14 px-6 text-center">
 
         <div className="text-6xl">
@@ -130,7 +278,8 @@ function Food() {
 
       </section>
 
-      {/* Search */}
+      {/* ================= SEARCH ================= */}
+
       <section className="max-w-6xl mx-auto px-6 py-10">
 
         <div className="bg-white rounded-2xl shadow-sm border p-6">
@@ -143,7 +292,7 @@ function Food() {
 
             <input
               type="text"
-              placeholder="Enter your location"
+              placeholder="Enter location, provider name, or type..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
@@ -161,13 +310,30 @@ function Food() {
               Search
             </button>
 
+            {search && (
+              <button
+                onClick={clearSearch}
+                className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300"
+              >
+                Clear
+              </button>
+            )}
+
           </div>
+
+          {search && (
+            <p className="text-gray-600 mt-3">
+              Showing results for:{" "}
+              <strong>{search}</strong>
+            </p>
+          )}
 
         </div>
 
       </section>
 
-      {/* Food providers */}
+      {/* ================= FOOD PROVIDERS ================= */}
+
       <section className="max-w-6xl mx-auto px-6 pb-16">
 
         <h2 className="text-2xl font-bold mb-6">
@@ -178,10 +344,10 @@ function Food() {
 
           <div className="grid md:grid-cols-3 gap-6">
 
-            {filteredProviders.map((provider, index) => (
+            {filteredProviders.map((provider) => (
 
               <div
-                key={index}
+                key={provider.id}
                 className="bg-white border rounded-2xl p-6 shadow-sm hover:shadow-md transition"
               >
 
@@ -205,12 +371,18 @@ function Food() {
                   {provider.type}
                 </span>
 
-                {/* Request Food */}
                 <button
                   onClick={() => handleRequest(provider)}
-                  className="w-full mt-5 bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700"
+                  disabled={provider.meals === 0}
+                  className={`w-full mt-5 text-white py-3 rounded-lg font-semibold ${
+                    provider.meals === 0
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-orange-600 hover:bg-orange-700"
+                  }`}
                 >
-                  Request Food
+                  {provider.meals === 0
+                    ? "No Meals Available"
+                    : "Request Food"}
                 </button>
 
               </div>
@@ -232,8 +404,15 @@ function Food() {
             </h3>
 
             <p className="text-gray-600 mt-2">
-              Try searching for another location.
+              Try searching for Dhanmondi, Mohammadpur, or Mirpur.
             </p>
+
+            <button
+              onClick={clearSearch}
+              className="mt-5 bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold"
+            >
+              Show All Providers
+            </button>
 
           </div>
 
@@ -287,14 +466,14 @@ function Food() {
 
                 </div>
 
-                {/* Form */}
+                {/* FORM */}
 
                 <form onSubmit={handleSubmit}>
 
-                  {/* Name */}
+                  {/* NAME */}
 
                   <label className="block font-semibold text-gray-700 mb-2">
-                    Full Name
+                    Full Name *
                   </label>
 
                   <input
@@ -307,10 +486,10 @@ function Food() {
                     className="w-full border rounded-lg px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-orange-500"
                   />
 
-                  {/* Phone */}
+                  {/* PHONE */}
 
                   <label className="block font-semibold text-gray-700 mb-2">
-                    Phone Number
+                    Phone Number *
                   </label>
 
                   <input
@@ -323,7 +502,7 @@ function Food() {
                     className="w-full border rounded-lg px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-orange-500"
                   />
 
-                  {/* Meals */}
+                  {/* MEALS */}
 
                   <label className="block font-semibold text-gray-700 mb-2">
                     Number of Meals
@@ -335,14 +514,26 @@ function Food() {
                     onChange={handleChange}
                     className="w-full border rounded-lg px-4 py-3 mb-6 outline-none focus:ring-2 focus:ring-orange-500"
                   >
-                    <option value="1">1 Meal</option>
-                    <option value="2">2 Meals</option>
-                    <option value="3">3 Meals</option>
-                    <option value="4">4 Meals</option>
-                    <option value="5">5 Meals</option>
+                    {Array.from(
+                      {
+                        length: Math.min(
+                          selectedProvider.meals,
+                          10
+                        ),
+                      },
+                      (_, index) => index + 1
+                    ).map((number) => (
+                      <option
+                        key={number}
+                        value={number}
+                      >
+                        {number}{" "}
+                        {number === 1 ? "Meal" : "Meals"}
+                      </option>
+                    ))}
                   </select>
 
-                  {/* Buttons */}
+                  {/* BUTTONS */}
 
                   <div className="flex gap-3">
 
@@ -384,8 +575,30 @@ function Food() {
                   Your food request has been submitted successfully.
                 </p>
 
-                <p className="text-gray-500 text-sm mt-2">
-                  We will contact you regarding your request.
+                <div className="bg-orange-50 rounded-lg p-4 mt-5 text-left">
+
+                  <p>
+                    <strong>Provider:</strong>{" "}
+                    {selectedProvider.name}
+                  </p>
+
+                  <p className="mt-2">
+                    <strong>Location:</strong>{" "}
+                    {selectedProvider.location}
+                  </p>
+
+                  <p className="mt-2">
+                    <strong>Status:</strong>{" "}
+                    <span className="text-orange-600 font-semibold">
+                      Pending
+                    </span>
+                  </p>
+
+                </div>
+
+                <p className="text-gray-500 text-sm mt-4">
+                  Your request has been saved. The food
+                  provider can review it later.
                 </p>
 
                 <button
