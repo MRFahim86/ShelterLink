@@ -1,15 +1,51 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 function Donate() {
+  const [user, setUser] = useState(null);
+  const [checkingLogin, setCheckingLogin] = useState(true);
+
   const [amount, setAmount] = useState("");
   const [purpose, setPurpose] = useState("");
+
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   // Quick donation amounts
   const quickAmounts = [100, 500, 1000];
+
+  // ================= CHECK LOGIN =================
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/user/profile", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        const data = await response.json();
+
+        console.log("Profile response:", data);
+
+        if (response.ok) {
+          setUser(data);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error("Login check error:", error);
+        setUser(null);
+      } finally {
+        setCheckingLogin(false);
+      }
+    };
+
+    checkLogin();
+  }, []);
 
   // Select quick amount
   const handleQuickAmount = (value) => {
@@ -35,6 +71,26 @@ function Donate() {
       return;
     }
 
+    // Payment method validation
+    if (!paymentMethod) {
+      setError("Please select how you want to donate.");
+      return;
+    }
+
+    // Account number validation
+    if (!accountNumber) {
+      setError(`Please enter your ${paymentMethod} account number.`);
+      return;
+    }
+
+    // Account number validation
+    if (!/^[0-9]{11}$/.test(accountNumber)) {
+      setError(
+        `Please enter a valid 11-digit ${paymentMethod} account number.`,
+      );
+      return;
+    }
+
     // Success
     setError("");
     setSuccess(true);
@@ -44,9 +100,21 @@ function Donate() {
   const handleReset = () => {
     setAmount("");
     setPurpose("");
+    setPaymentMethod("");
+    setAccountNumber("");
     setError("");
     setSuccess(false);
   };
+
+  // ================= CHECKING LOGIN =================
+
+  if (checkingLogin) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-lg font-semibold text-gray-600">Checking login...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -95,246 +163,344 @@ function Donate() {
         </p>
       </section>
 
-      {/* ================= DONATION TYPES ================= */}
+      {/* ====================================================== */}
+      {/* ================= NOT LOGGED IN ====================== */}
+      {/* ====================================================== */}
 
-      <section className="max-w-6xl mx-auto px-6">
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Food */}
-
-          <button
-            type="button"
-            onClick={() => {
-              setPurpose("Food");
-              setError("");
-            }}
-            className={`bg-white rounded-2xl border p-8 text-center shadow-sm transition hover:shadow-md ${
-              purpose === "Food"
-                ? "border-green-600 ring-2 ring-green-200"
-                : "border-gray-200"
-            }`}
-          >
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-3xl">
-              🍲
-            </div>
-
-            <h2 className="text-xl font-bold text-gray-900 mt-6">
-              Provide Food
+      {!user ? (
+        <section className="max-w-2xl mx-auto px-6 pb-12">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-10 text-center">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Login to Donate
             </h2>
 
-            <p className="text-gray-600 mt-4 leading-relaxed">
-              Help provide nutritious meals to people who need them.
+            <p className="text-gray-600 mt-4">
+              Please log in to your account before making a donation.
             </p>
-          </button>
 
-          {/* Shelter */}
+            <Link
+              to="/login"
+              state={{ from: "/donate" }}
+              className="inline-block mt-6 bg-green-700 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-800 transition"
+            >
+              Login to Donate
+            </Link>
+          </div>
+        </section>
+      ) : (
+        <>
+          {/* ================= DONATION TYPES ================= */}
 
-          <button
-            type="button"
-            onClick={() => {
-              setPurpose("Shelter");
-              setError("");
-            }}
-            className={`bg-white rounded-2xl border p-8 text-center shadow-sm transition hover:shadow-md ${
-              purpose === "Shelter"
-                ? "border-green-600 ring-2 ring-green-200"
-                : "border-gray-200"
-            }`}
-          >
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-3xl">
-              🏠
-            </div>
-
-            <h2 className="text-xl font-bold text-gray-900 mt-6">
-              Support Shelter
-            </h2>
-
-            <p className="text-gray-600 mt-4 leading-relaxed">
-              Help people access safe and temporary accommodation.
-            </p>
-          </button>
-
-          {/* Medical */}
-
-          <button
-            type="button"
-            onClick={() => {
-              setPurpose("Medical");
-              setError("");
-            }}
-            className={`bg-white rounded-2xl border p-8 text-center shadow-sm transition hover:shadow-md ${
-              purpose === "Medical"
-                ? "border-green-600 ring-2 ring-green-200"
-                : "border-gray-200"
-            }`}
-          >
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-3xl">
-              🏥
-            </div>
-
-            <h2 className="text-xl font-bold text-gray-900 mt-6">
-              Medical Support
-            </h2>
-
-            <p className="text-gray-600 mt-4 leading-relaxed">
-              Help provide essential healthcare and medical assistance.
-            </p>
-          </button>
-        </div>
-      </section>
-
-      {/* ================= DONATION FORM ================= */}
-
-      <section className="max-w-6xl mx-auto px-6 py-12">
-        <div className="bg-green-800 rounded-3xl p-8 md:p-12">
-          {!success ? (
-            <>
-              <div className="text-center text-white mb-8">
-                <h2 className="text-3xl font-bold">
-                  Ready to make a difference?
-                </h2>
-
-                <p className="mt-3 text-green-100">
-                  Choose your donation purpose and amount.
-                </p>
-              </div>
-
-              <form
-                onSubmit={handleSubmit}
-                className="bg-white rounded-2xl p-6 md:p-8 max-w-2xl mx-auto"
-              >
-                {/* Donation Purpose */}
-
-                <label className="block font-semibold text-gray-800 mb-2">
-                  Donation Purpose
-                </label>
-
-                <select
-                  value={purpose}
-                  onChange={(e) => {
-                    setPurpose(e.target.value);
-                    setError("");
-                  }}
-                  className="w-full border rounded-lg px-4 py-3 mb-6 outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="">Select purpose</option>
-
-                  <option value="Food">Provide Food</option>
-
-                  <option value="Shelter">Support Shelter</option>
-
-                  <option value="Medical">Medical Support</option>
-                </select>
-
-                {/* Amount */}
-
-                <label className="block font-semibold text-gray-800 mb-3">
-                  Donation Amount
-                </label>
-
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  {quickAmounts.map((value) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => handleQuickAmount(value)}
-                      className={`py-3 rounded-lg font-bold border transition ${
-                        amount === value.toString()
-                          ? "bg-green-700 text-white border-green-700"
-                          : "bg-white text-green-700 border-green-300 hover:bg-green-50"
-                      }`}
-                    >
-                      ৳{value}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Custom Amount */}
-
-                <input
-                  type="number"
-                  min="1"
-                  placeholder="Enter custom amount"
-                  value={amount}
-                  onChange={(e) => {
-                    setAmount(e.target.value);
-                    setError("");
-                  }}
-                  className="w-full border rounded-lg px-4 py-3 mb-6 outline-none focus:ring-2 focus:ring-green-500"
-                />
-
-                {/* Error */}
-
-                {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-5 text-sm">
-                    ⚠️ {error}
-                  </div>
-                )}
-
-                {/* Selected Donation Summary */}
-
-                {amount && purpose && (
-                  <div className="bg-green-50 rounded-lg p-4 mb-5">
-                    <p className="text-gray-700">
-                      Donation:
-                      <span className="font-bold ml-2">৳{amount}</span>
-                    </p>
-
-                    <p className="text-gray-700 mt-1">
-                      Purpose:
-                      <span className="font-bold ml-2">{purpose}</span>
-                    </p>
-                  </div>
-                )}
-
-                {/* Submit */}
-
-                <button
-                  type="submit"
-                  className="w-full bg-green-700 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-800 transition"
-                >
-                  Donate Now
-                </button>
-              </form>
-            </>
-          ) : (
-            /* ================= SUCCESS ================= */
-
-            <div className="bg-white rounded-2xl p-10 text-center max-w-2xl mx-auto">
-              <div className="text-6xl mb-5">🎉</div>
-
-              <h2 className="text-3xl font-bold text-green-700">
-                Thank You!
-              </h2>
-
-              <p className="text-gray-700 text-lg mt-4">
-                Your donation request has been recorded successfully.
-              </p>
-
-              <div className="bg-green-50 rounded-xl p-5 mt-6 text-left">
-                <p className="text-gray-700">
-                  <strong>Amount:</strong> ৳{amount}
-                </p>
-
-                <p className="text-gray-700 mt-2">
-                  <strong>Purpose:</strong> {purpose}
-                </p>
-              </div>
-
-              <p className="text-gray-500 text-sm mt-5">
-                In the final version, this donation can be connected to a
-                payment gateway and backend database.
-              </p>
+          <section className="max-w-6xl mx-auto px-6">
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Food */}
 
               <button
-                onClick={handleReset}
-                className="mt-6 bg-green-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-800"
+                type="button"
+                onClick={() => {
+                  setPurpose("Food");
+                  setError("");
+                }}
+                className={`bg-white rounded-2xl border p-8 text-center shadow-sm transition hover:shadow-md ${
+                  purpose === "Food"
+                    ? "border-green-600 ring-2 ring-green-200"
+                    : "border-gray-200"
+                }`}
               >
-                Make Another Donation
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-3xl">
+                  🍲
+                </div>
+
+                <h2 className="text-xl font-bold text-gray-900 mt-6">
+                  Provide Food
+                </h2>
+
+                <p className="text-gray-600 mt-4 leading-relaxed">
+                  Help provide nutritious meals to people who need them.
+                </p>
+              </button>
+
+              {/* Shelter */}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setPurpose("Shelter");
+                  setError("");
+                }}
+                className={`bg-white rounded-2xl border p-8 text-center shadow-sm transition hover:shadow-md ${
+                  purpose === "Shelter"
+                    ? "border-green-600 ring-2 ring-green-200"
+                    : "border-gray-200"
+                }`}
+              >
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-3xl">
+                  🏠
+                </div>
+
+                <h2 className="text-xl font-bold text-gray-900 mt-6">
+                  Support Shelter
+                </h2>
+
+                <p className="text-gray-600 mt-4 leading-relaxed">
+                  Help people access safe and temporary accommodation.
+                </p>
+              </button>
+
+              {/* Medical */}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setPurpose("Medical");
+                  setError("");
+                }}
+                className={`bg-white rounded-2xl border p-8 text-center shadow-sm transition hover:shadow-md ${
+                  purpose === "Medical"
+                    ? "border-green-600 ring-2 ring-green-200"
+                    : "border-gray-200"
+                }`}
+              >
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-3xl">
+                  🏥
+                </div>
+
+                <h2 className="text-xl font-bold text-gray-900 mt-6">
+                  Medical Support
+                </h2>
+
+                <p className="text-gray-600 mt-4 leading-relaxed">
+                  Help provide essential healthcare and medical assistance.
+                </p>
               </button>
             </div>
-          )}
-        </div>
-      </section>
+          </section>
+
+          {/* ================= DONATION FORM ================= */}
+
+          <section className="max-w-6xl mx-auto px-6 py-12">
+            <div className="bg-green-800 rounded-3xl p-8 md:p-12">
+              {!success ? (
+                <>
+                  <div className="text-center text-white mb-8">
+                    <h2 className="text-3xl font-bold">
+                      Ready to make a difference?
+                    </h2>
+
+                    <p className="mt-3 text-green-100">
+                      Choose your donation purpose and amount.
+                    </p>
+                  </div>
+
+                  <form
+                    onSubmit={handleSubmit}
+                    className="bg-white rounded-2xl p-6 md:p-8 max-w-2xl mx-auto"
+                  >
+                    {/* Donation Purpose */}
+
+                    <label className="block font-semibold text-gray-800 mb-2">
+                      Donation Purpose
+                    </label>
+
+                    <select
+                      value={purpose}
+                      onChange={(e) => {
+                        setPurpose(e.target.value);
+                        setError("");
+                      }}
+                      className="w-full border rounded-lg px-4 py-3 mb-6 outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      <option value="">Select purpose</option>
+
+                      <option value="Food">Provide Food</option>
+
+                      <option value="Shelter">Support Shelter</option>
+
+                      <option value="Medical">Medical Support</option>
+                    </select>
+
+                    {/* Amount */}
+
+                    <label className="block font-semibold text-gray-800 mb-3">
+                      Donation Amount
+                    </label>
+
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                      {quickAmounts.map((value) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => handleQuickAmount(value)}
+                          className={`py-3 rounded-lg font-bold border transition ${
+                            amount === value.toString()
+                              ? "bg-green-700 text-white border-green-700"
+                              : "bg-white text-green-700 border-green-300 hover:bg-green-50"
+                          }`}
+                        >
+                          ৳{value}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Custom Amount */}
+
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="Enter custom amount"
+                      value={amount}
+                      onChange={(e) => {
+                        setAmount(e.target.value);
+                        setError("");
+                      }}
+                      className="w-full border rounded-lg px-4 py-3 mb-6 outline-none focus:ring-2 focus:ring-green-500"
+                    />
+
+                    {/* ================= HOW TO DONATE ================= */}
+
+                    <label className="block font-semibold text-gray-800 mb-3">
+                      How to Donate
+                    </label>
+
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPaymentMethod("bKash");
+                          setError("");
+                        }}
+                        className={`py-3 rounded-lg font-bold border transition ${
+                          paymentMethod === "bKash"
+                            ? "bg-green-700 text-white border-green-700"
+                            : "bg-white text-green-700 border-green-300 hover:bg-green-50"
+                        }`}
+                      >
+                        bKash
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPaymentMethod("Rocket");
+                          setError("");
+                        }}
+                        className={`py-3 rounded-lg font-bold border transition ${
+                          paymentMethod === "Rocket"
+                            ? "bg-green-700 text-white border-green-700"
+                            : "bg-white text-green-700 border-green-300 hover:bg-green-50"
+                        }`}
+                      >
+                        Rocket
+                      </button>
+                    </div>
+
+                    {/* Account Number */}
+
+                    {paymentMethod && (
+                      <>
+                        <label className="block font-semibold text-gray-800 mb-2">
+                          {paymentMethod} Account Number
+                        </label>
+
+                        <input
+                          type="tel"
+                          maxLength="11"
+                          placeholder={`Enter your ${paymentMethod} account number`}
+                          value={accountNumber}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, "");
+
+                            setAccountNumber(value);
+                            setError("");
+                          }}
+                          className="w-full border rounded-lg px-4 py-3 mb-6 outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </>
+                    )}
+
+                    {/* Error */}
+
+                    {error && (
+                      <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-5 text-sm">
+                        ⚠️ {error}
+                      </div>
+                    )}
+
+                    {/* Selected Donation Summary */}
+
+                    {amount && purpose && (
+                      <div className="bg-green-50 rounded-lg p-4 mb-5">
+                        <p className="text-gray-700">
+                          Donation:
+                          <span className="font-bold ml-2">৳{amount}</span>
+                        </p>
+
+                        <p className="text-gray-700 mt-1">
+                          Purpose:
+                          <span className="font-bold ml-2">{purpose}</span>
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Submit */}
+
+                    <button
+                      type="submit"
+                      className="w-full bg-green-700 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-800 transition"
+                    >
+                      Donate Now
+                    </button>
+                  </form>
+                </>
+              ) : (
+                /* ================= SUCCESS ================= */
+
+                <div className="bg-white rounded-2xl p-10 text-center max-w-2xl mx-auto">
+                  <div className="text-6xl mb-5">🎉</div>
+
+                  <h2 className="text-3xl font-bold text-green-700">
+                    Thank You!
+                  </h2>
+
+                  <p className="text-gray-700 text-lg mt-4">
+                    Your donation request has been recorded successfully.
+                  </p>
+
+                  <div className="bg-green-50 rounded-xl p-5 mt-6 text-left">
+                    <p className="text-gray-700">
+                      <strong>Amount:</strong> ৳{amount}
+                    </p>
+
+                    <p className="text-gray-700 mt-2">
+                      <strong>Purpose:</strong> {purpose}
+                    </p>
+
+                    <p className="text-gray-700 mt-2">
+                      <strong>Payment Method:</strong> {paymentMethod}
+                    </p>
+
+                    <p className="text-gray-700 mt-2">
+                      <strong>Account Number:</strong> {accountNumber}
+                    </p>
+                  </div>
+
+                  <p className="text-gray-500 text-sm mt-5">
+                    In the final version, this donation can be connected to a
+                    payment gateway and backend database.
+                  </p>
+
+                  <button
+                    onClick={handleReset}
+                    className="mt-6 bg-green-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-800"
+                  >
+                    Make Another Donation
+                  </button>
+                </div>
+              )}
+            </div>
+          </section>
+        </>
+      )}
     </div>
   );
 }

@@ -1,4 +1,11 @@
-import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { useEffect, useState } from "react";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -120,12 +127,14 @@ function ServiceCard({ icon, title, description, button, link }) {
   );
 }
 function LoginProtection({ children }) {
+  const location = useLocation();
+
   const [checking, setChecking] = useState(true);
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     fetch("http://localhost:4000/user/profile", {
-      credentials: "include"
+      credentials: "include",
     })
       .then((response) => {
         if (response.ok) {
@@ -145,6 +154,10 @@ function LoginProtection({ children }) {
   }
 
   if (loggedIn) {
+    if (location.state?.from === "/donate") {
+      return <Navigate to="/donate" replace />;
+    }
+
     return <Navigate to="/user" replace />;
   }
 
@@ -160,19 +173,19 @@ function App() {
         <Route path="/" element={<Home />} />
 
         {/* AUTHENTICATION */}
-       <Route
-  path="/login"
-  element={
-    <LoginProtection>
-      <Login />
-    </LoginProtection>
-  }
-/>
+        <Route
+          path="/login"
+          element={
+            <LoginProtection>
+              <Login />
+            </LoginProtection>
+          }
+        />
 
         <Route path="/register" element={<Register />} />
 
-  	{/* USER PAGE */}
-<Route path="/user" element={<User />} />
+        {/* USER PAGE */}
+        <Route path="/user" element={<User />} />
 
         {/* DONATE */}
         <Route path="/donate" element={<Donate />} />
