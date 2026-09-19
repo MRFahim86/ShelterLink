@@ -19,7 +19,7 @@ function User() {
         const data = await response.json();
 
         if (response.ok) {
-          setUser(data.user);
+          setUser(data);
         } else {
           setMessage(data.message);
           navigate("/login");
