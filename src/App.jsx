@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-
+import { useEffect, useState } from "react";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -119,7 +119,37 @@ function ServiceCard({ icon, title, description, button, link }) {
     </div>
   );
 }
+function LoginProtection({ children }) {
+  const [checking, setChecking] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
 
+  useEffect(() => {
+    fetch("http://localhost:4000/user/profile", {
+      credentials: "include"
+    })
+      .then((response) => {
+        if (response.ok) {
+          setLoggedIn(true);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setChecking(false);
+      });
+  }, []);
+
+  if (checking) {
+    return <div>Loading...</div>;
+  }
+
+  if (loggedIn) {
+    return <Navigate to="/user" replace />;
+  }
+
+  return children;
+}
 // ================= MAIN APP =================
 
 function App() {
@@ -130,7 +160,14 @@ function App() {
         <Route path="/" element={<Home />} />
 
         {/* AUTHENTICATION */}
-        <Route path="/login" element={<Login />} />
+       <Route
+  path="/login"
+  element={
+    <LoginProtection>
+      <Login />
+    </LoginProtection>
+  }
+/>
 
         <Route path="/register" element={<Register />} />
 
