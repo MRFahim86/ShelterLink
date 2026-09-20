@@ -1,21 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 function Shelter() {
-  const shelters = [
+  const initialShelters = [
     {
+      id: 1,
       name: "Hope Community Shelter",
       location: "Dhanmondi, Dhaka",
       beds: 12,
       type: "Emergency Shelter",
     },
     {
+      id: 2,
       name: "Safe Haven Center",
       location: "Mohammadpur, Dhaka",
       beds: 8,
       type: "Temporary Shelter",
     },
     {
+      id: 3,
       name: "Community Care Home",
       location: "Mirpur, Dhaka",
       beds: 15,
@@ -23,44 +26,106 @@ function Shelter() {
     },
   ];
 
-  // Search
-  const [search, setSearch] = useState("");
-  const [searchLocation, setSearchLocation] = useState("");
+  // ================= SHELTERS =================
 
-  // Request modal
+  const [shelters, setShelters] = useState(() => {
+    const saved = localStorage.getItem("shelterlink_shelters");
+
+    return saved ? JSON.parse(saved) : initialShelters;
+  });
+
+  // Save updated bed numbers
+  useEffect(() => {
+    localStorage.setItem(
+      "shelterlink_shelters",
+      JSON.stringify(shelters)
+    );
+  }, [shelters]);
+
+  // ================= SEARCH =================
+
+  const [search, setSearch] = useState("");
+
+  const filteredShelters = shelters.filter((shelter) => {
+    const searchText = search.toLowerCase().trim();
+
+    if (!searchText) {
+      return true;
+    }
+
+    return (
+      shelter.name.toLowerCase().includes(searchText) ||
+      shelter.location.toLowerCase().includes(searchText) ||
+      shelter.type.toLowerCase().includes(searchText)
+    );
+  });
+
+  // ================= MODAL =================
+
   const [selectedShelter, setSelectedShelter] = useState(null);
 
-  // Form data
+  const [success, setSuccess] = useState(false);
+
+  // ================= FORM =================
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     people: "1",
   });
 
-  // Success message
-  const [success, setSuccess] = useState(false);
+  // ================= MESSAGE =================
 
-  // Search filter
-  const filteredShelters = shelters.filter((shelter) =>
-    shelter.location.toLowerCase().includes(searchLocation.toLowerCase())
-  );
+  const [message, setMessage] = useState("");
 
-  // Search button
+  // ================= SEARCH =================
+
   const handleSearch = () => {
-    setSearchLocation(search);
+    setSearch(search.trim());
   };
 
-  // Input change
+  const clearSearch = () => {
+    setSearch("");
+  };
+
+  // ================= INPUT =================
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    // Phone: numbers only
+    if (name === "phone") {
+      const numbersOnly = value.replace(/\D/g, "");
+
+      setFormData((previous) => ({
+        ...previous,
+        phone: numbersOnly,
+      }));
+
+      return;
+    }
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
   };
 
-  // Open request form
+  // ================= REQUEST =================
+
   const handleRequest = (shelter) => {
+    if (shelter.beds <= 0) {
+      setMessage("Sorry, this shelter currently has no available beds.");
+
+      setTimeout(() => {
+        setMessage("");
+      }, 4000);
+
+      return;
+    }
+
     setSelectedShelter(shelter);
+
     setSuccess(false);
 
     setFormData({
@@ -70,13 +135,72 @@ function Shelter() {
     });
   };
 
-  // Submit request
+  // ================= SUBMIT =================
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const numberOfPeople = Number(formData.people);
+
+    if (!formData.name || !formData.phone) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    if (formData.phone.length < 10) {
+      alert("Please enter a valid phone number.");
+      return;
+    }
+
+    if (numberOfPeople > selectedShelter.beds) {
+      alert(
+        `Only ${selectedShelter.beds} bed(s) are currently available.`
+      );
+
+      return;
+    }
+
+    // Create request
+    const request = {
+      id: Date.now(),
+      name: formData.name,
+      phone: formData.phone,
+      people: numberOfPeople,
+      shelter: selectedShelter.name,
+      location: selectedShelter.location,
+      type: selectedShelter.type,
+      date: new Date().toLocaleString(),
+      status: "Pending",
+    };
+
+    // Get previous requests
+    const previousRequests = JSON.parse(
+      localStorage.getItem("shelterlink_shelter_requests") || "[]"
+    );
+
+    // Add new request
+    previousRequests.push(request);
+
+    // Save requests
+    localStorage.setItem(
+      "shelterlink_shelter_requests",
+      JSON.stringify(previousRequests)
+    );
+
+    // Decrease available beds
+    setShelters((previous) =>
+      previous.map((shelter) =>
+        shelter.id === selectedShelter.id
+          ? {
+              ...shelter,
+              beds: shelter.beds - numberOfPeople,
+            }
+          : shelter
+      )
+    );
+
     setSuccess(true);
 
-    // Form clear
     setFormData({
       name: "",
       phone: "",
@@ -84,7 +208,8 @@ function Shelter() {
     });
   };
 
-  // Close modal
+  // ================= CLOSE =================
+
   const closeModal = () => {
     setSelectedShelter(null);
     setSuccess(false);
@@ -113,6 +238,13 @@ function Shelter() {
 
         </div>
       </header>
+
+      {/* Success / Error message */}
+      {message && (
+        <div className="fixed top-5 right-5 z-50 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg">
+          {message}
+        </div>
+      )}
 
       {/* Hero */}
       <section className="bg-green-50 py-14 px-6 text-center">
@@ -144,7 +276,7 @@ function Shelter() {
 
             <input
               type="text"
-              placeholder="Enter your location"
+              placeholder="Enter location, shelter name, or type..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
@@ -162,7 +294,23 @@ function Shelter() {
               Search
             </button>
 
+            {search && (
+              <button
+                onClick={clearSearch}
+                className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300"
+              >
+                Clear
+              </button>
+            )}
+
           </div>
+
+          {search && (
+            <p className="text-gray-600 mt-3">
+              Showing results for:{" "}
+              <strong>{search}</strong>
+            </p>
+          )}
 
         </div>
 
@@ -179,10 +327,10 @@ function Shelter() {
 
           <div className="grid md:grid-cols-3 gap-6">
 
-            {filteredShelters.map((shelter, index) => (
+            {filteredShelters.map((shelter) => (
 
               <div
-                key={index}
+                key={shelter.id}
                 className="bg-white border rounded-2xl p-6 shadow-sm hover:shadow-md transition"
               >
 
@@ -206,12 +354,18 @@ function Shelter() {
                   {shelter.type}
                 </span>
 
-                {/* Request Button */}
                 <button
                   onClick={() => handleRequest(shelter)}
-                  className="w-full mt-5 bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-800"
+                  disabled={shelter.beds === 0}
+                  className={`w-full mt-5 text-white py-3 rounded-lg font-semibold ${
+                    shelter.beds === 0
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-green-700 hover:bg-green-800"
+                  }`}
                 >
-                  Request Shelter
+                  {shelter.beds === 0
+                    ? "No Beds Available"
+                    : "Request Shelter"}
                 </button>
 
               </div>
@@ -233,8 +387,15 @@ function Shelter() {
             </h3>
 
             <p className="text-gray-600 mt-2">
-              Try searching for another location.
+              Try searching for Dhanmondi, Mohammadpur, or Mirpur.
             </p>
+
+            <button
+              onClick={clearSearch}
+              className="mt-5 bg-green-700 text-white px-6 py-3 rounded-lg font-semibold"
+            >
+              Show All Shelters
+            </button>
 
           </div>
 
@@ -292,10 +453,8 @@ function Shelter() {
 
                 <form onSubmit={handleSubmit}>
 
-                  {/* Name */}
-
                   <label className="block font-semibold text-gray-700 mb-2">
-                    Full Name
+                    Full Name *
                   </label>
 
                   <input
@@ -308,10 +467,8 @@ function Shelter() {
                     className="w-full border rounded-lg px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-green-500"
                   />
 
-                  {/* Phone */}
-
                   <label className="block font-semibold text-gray-700 mb-2">
-                    Phone Number
+                    Phone Number *
                   </label>
 
                   <input
@@ -324,8 +481,6 @@ function Shelter() {
                     className="w-full border rounded-lg px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-green-500"
                   />
 
-                  {/* People */}
-
                   <label className="block font-semibold text-gray-700 mb-2">
                     Number of People
                   </label>
@@ -336,11 +491,20 @@ function Shelter() {
                     onChange={handleChange}
                     className="w-full border rounded-lg px-4 py-3 mb-6 outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="1">1 Person</option>
-                    <option value="2">2 People</option>
-                    <option value="3">3 People</option>
-                    <option value="4">4 People</option>
-                    <option value="5">5 People</option>
+                    {Array.from(
+                      {
+                        length: Math.min(selectedShelter.beds, 5),
+                      },
+                      (_, index) => index + 1
+                    ).map((number) => (
+                      <option
+                        key={number}
+                        value={number}
+                      >
+                        {number}{" "}
+                        {number === 1 ? "Person" : "People"}
+                      </option>
+                    ))}
                   </select>
 
                   {/* Buttons */}
@@ -369,7 +533,7 @@ function Shelter() {
 
             ) : (
 
-              /* ================= SUCCESS MESSAGE ================= */
+              /* ================= SUCCESS ================= */
 
               <div className="text-center py-6">
 
@@ -385,8 +549,35 @@ function Shelter() {
                   Your shelter request has been submitted successfully.
                 </p>
 
-                <p className="text-gray-500 text-sm mt-2">
-                  We will contact you regarding your request.
+                <div className="bg-green-50 rounded-lg p-4 mt-5 text-left">
+
+                  <p>
+                    <strong>Shelter:</strong>{" "}
+                    {selectedShelter.name}
+                  </p>
+
+                  <p className="mt-2">
+                    <strong>Location:</strong>{" "}
+                    {selectedShelter.location}
+                  </p>
+
+                  <p className="mt-2">
+                    <strong>People:</strong>{" "}
+                    {formData.people}
+                  </p>
+
+                  <p className="mt-2">
+                    <strong>Status:</strong>{" "}
+                    <span className="text-orange-600 font-semibold">
+                      Pending
+                    </span>
+                  </p>
+
+                </div>
+
+                <p className="text-gray-500 text-sm mt-4">
+                  Your request has been saved. The shelter
+                  provider can review it later.
                 </p>
 
                 <button
