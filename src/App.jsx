@@ -12,7 +12,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Donate from "./pages/Donate";
 import User from "./pages/User";
-
+import Admin from "./pages/Admin";
 import Shelter from "./pages/Shelter";
 import Food from "./pages/Food";
 import Medical from "./pages/Medical";
@@ -133,14 +133,18 @@ function LoginProtection({ children }) {
 
   const [checking, setChecking] = useState(true);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
     fetch("http://localhost:4000/user/profile", {
       credentials: "include",
     })
-      .then((response) => {
+      .then(async (response) => {
         if (response.ok) {
+          const data = await response.json();
+
           setLoggedIn(true);
+          setRole(data.user.role);
         }
       })
       .catch((error) => {
@@ -156,6 +160,12 @@ function LoginProtection({ children }) {
   }
 
   if (loggedIn) {
+    // Admin user
+    if (role === "admin") {
+      return <Navigate to="/admin" replace />;
+    }
+
+    // Normal user trying to access login
     if (location.state?.from === "/donate") {
       return <Navigate to="/donate" replace />;
     }
@@ -187,6 +197,7 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         <Route path="/help" element={<Help />} />
+        <Route path="/admin" element={<Admin />} />
 
         {/* USER PAGE */}
         <Route path="/user" element={<User />} />

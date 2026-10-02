@@ -14,8 +14,29 @@ const Help = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch(
+      "http://localhost:4000/help",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify(formData),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message);
+      return;
+    }
 
     alert("Your help request has been submitted!");
 
@@ -24,7 +45,12 @@ const Help = () => {
       phone: "",
       message: "",
     });
-  };
+
+  } catch (error) {
+    console.log(error);
+    alert("Cannot connect to server");
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50">

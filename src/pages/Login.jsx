@@ -45,7 +45,11 @@ function Login() {
 
       console.log(data);
 
-      navigate("/user");
+     if (data.user.role === "admin") {
+  navigate("/admin");
+} else {
+  navigate("/user");
+}
 
     } catch (error) {
       console.log(error);
