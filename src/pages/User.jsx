@@ -162,6 +162,26 @@ function User() {
           </div>
         </div>
 
+        {/* Donation Information */}
+        <div className="rounded-3xl bg-white p-8 shadow-sm">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
+            📋
+          </div>
+
+          <h3 className="mt-5 text-2xl font-bold">Donation Information</h3>
+
+          <p className="mt-3 text-gray-600">
+            View your previous donations and donation details.
+          </p>
+
+          <Link
+            to="/donation-info"
+            className="mt-6 inline-block rounded-full bg-green-700 px-6 py-3 font-semibold text-white hover:bg-green-800"
+          >
+            View Donations
+          </Link>
+        </div>
+
         {/* ================= ACCOUNT INFORMATION ================= */}
         <section className="mt-8 rounded-3xl bg-white p-8 shadow-sm">
           <h3 className="text-2xl font-bold">Account Information</h3>

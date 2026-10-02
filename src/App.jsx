@@ -18,6 +18,7 @@ import Food from "./pages/Food";
 import Medical from "./pages/Medical";
 import Volunteer from "./pages/Volunteer";
 import Help from "./pages/Help";
+import DonationInfo from "./pages/DonationInfo";
 
 // ================= SERVICES PAGE =================
 
@@ -185,14 +186,15 @@ function App() {
 
         <Route path="/register" element={<Register />} />
 
-        <Route path="/help"
-        element={<Help/>} />
+        <Route path="/help" element={<Help />} />
 
         {/* USER PAGE */}
         <Route path="/user" element={<User />} />
 
         {/* DONATE */}
         <Route path="/donate" element={<Donate />} />
+
+        <Route path="/donation-info" element={<DonationInfo />} />
 
         {/* SERVICES */}
         <Route path="/services" element={<Services />} />

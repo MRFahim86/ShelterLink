@@ -5,6 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRoute from "./routes/userRoute.js";
 import authRoute from "./routes/authRoute.js";
+import donationRoute from "./routes/donationRoute.js";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authRoute);
 app.use("/user", userRoute);
+app.use("/donations", donationRoute);
 
 // Port
 const PORT = process.env.PORT || 4000;

@@ -54,47 +54,74 @@ function Donate() {
   };
 
   // Submit donation
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const donationAmount = Number(amount);
+  const donationAmount = Number(amount);
 
-    // Amount validation
-    if (!amount || donationAmount <= 0) {
-      setError("Please enter a valid donation amount.");
+  // Amount validation
+  if (!amount || donationAmount <= 0) {
+    setError("Please enter a valid donation amount.");
+    return;
+  }
+
+  // Purpose validation
+  if (!purpose) {
+    setError("Please select a donation purpose.");
+    return;
+  }
+
+  // Payment method validation
+  if (!paymentMethod) {
+    setError("Please select how you want to donate.");
+    return;
+  }
+
+  // Account number validation
+  if (!accountNumber) {
+    setError(`Please enter your ${paymentMethod} account number.`);
+    return;
+  }
+
+  // Account number validation
+  if (!/^[0-9]{11}$/.test(accountNumber)) {
+    setError(
+      `Please enter a valid 11-digit ${paymentMethod} account number.`,
+    );
+    return;
+  }
+
+  // Save donation to backend
+  try {
+    const response = await fetch("http://localhost:4000/donations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        amount: donationAmount,
+        purpose,
+        paymentMethod,
+        accountNumber,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data.message || "Failed to record donation.");
       return;
     }
 
-    // Purpose validation
-    if (!purpose) {
-      setError("Please select a donation purpose.");
-      return;
-    }
-
-    // Payment method validation
-    if (!paymentMethod) {
-      setError("Please select how you want to donate.");
-      return;
-    }
-
-    // Account number validation
-    if (!accountNumber) {
-      setError(`Please enter your ${paymentMethod} account number.`);
-      return;
-    }
-
-    // Account number validation
-    if (!/^[0-9]{11}$/.test(accountNumber)) {
-      setError(
-        `Please enter a valid 11-digit ${paymentMethod} account number.`,
-      );
-      return;
-    }
-
-    // Success
+    // Donation successfully saved
     setError("");
     setSuccess(true);
-  };
+  } catch (error) {
+    console.error("Donation error:", error);
+    setError("Cannot connect to server.");
+  }
+};
 
   // Reset form
   const handleReset = () => {
@@ -163,9 +190,7 @@ function Donate() {
         </p>
       </section>
 
-      {/* ====================================================== */}
       {/* ================= NOT LOGGED IN ====================== */}
-      {/* ====================================================== */}
 
       {!user ? (
         <section className="max-w-2xl mx-auto px-6 pb-12">
