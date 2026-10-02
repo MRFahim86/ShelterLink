@@ -17,6 +17,7 @@ import Shelter from "./pages/Shelter";
 import Food from "./pages/Food";
 import Medical from "./pages/Medical";
 import Volunteer from "./pages/Volunteer";
+import Help from "./pages/Help";
 
 // ================= SERVICES PAGE =================
 
@@ -183,6 +184,9 @@ function App() {
         />
 
         <Route path="/register" element={<Register />} />
+
+        <Route path="/help"
+        element={<Help/>} />
 
         {/* USER PAGE */}
         <Route path="/user" element={<User />} />

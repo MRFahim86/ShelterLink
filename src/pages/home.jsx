@@ -160,16 +160,15 @@ function Home() {
             </button>
 
             {/* Find Help */}
-            <button
-              onClick={() => {
-                document
-                  .getElementById("find-help")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="hover:text-green-700"
-            >
-              Find Help
-            </button>
+           {/* Find Help */}
+<button
+  onClick={() => {
+    window.location.href = "/help";
+  }}
+  className="hover:text-green-700"
+>
+  Find Help
+</button>
 
             {/* Donate */}
             <button
@@ -198,7 +197,7 @@ function Home() {
             )}
             {/* Need Help */}
             <button
-              onClick={() => navigate("/services")}
+              onClick={() => navigate("/help")}
               className="rounded-full bg-green-700 px-6 py-3 text-white hover:bg-green-800"
             >
               Need Help?
