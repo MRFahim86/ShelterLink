@@ -7,6 +7,7 @@ import userRoute from "./routes/userRoute.js";
 import authRoute from "./routes/authRoute.js";
 import donationRoute from "./routes/donationRoute.js";
 import helpRoute from "./routes/helpRoute.js";
+import carbonMiddleware from "./middleware/carbonMiddleware.js";
 
 dotenv.config();
 

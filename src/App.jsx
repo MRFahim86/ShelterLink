@@ -19,8 +19,8 @@ import Medical from "./pages/Medical";
 import Volunteer from "./pages/Volunteer";
 import Help from "./pages/Help";
 import DonationInfo from "./pages/DonationInfo";
-
-// ================= SERVICES PAGE =================
+import CarbonFootprintDisplay from "./pages/CarbonFootprintDisplay";
+// SERVICES PAGE
 
 function Services() {
   return (
@@ -104,7 +104,7 @@ function Services() {
   );
 }
 
-// ================= SERVICE CARD =================
+// SERVICE CARD
 
 function ServiceCard({ icon, title, description, button, link }) {
   return (
@@ -175,11 +175,12 @@ function LoginProtection({ children }) {
 
   return children;
 }
-// ================= MAIN APP =================
+// MAIN APP
 
 function App() {
   return (
     <BrowserRouter>
+      <CarbonFootprintDisplay />
       <Routes>
         {/* HOME */}
         <Route path="/" element={<Home />} />
