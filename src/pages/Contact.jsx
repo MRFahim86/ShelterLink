@@ -1,6 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Contact = () => {
+  const navigate = useNavigate();
+
   const members = [
     {
       name: "Mahfuzur Rahman",
@@ -19,7 +22,15 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-12">
       <div className="mx-auto max-w-4xl">
-        
+
+        {/* Back to Home Button */}
+        <button
+          onClick={() => navigate("/")}
+          className="mb-8 rounded-lg bg-green-600 px-5 py-2.5 font-medium text-white shadow hover:bg-green-700 transition"
+        >
+          ← Back to Home
+        </button>
+
         {/* Heading */}
         <div className="mb-10 text-center">
           <h1 className="text-4xl font-bold text-gray-800">
