@@ -7,12 +7,11 @@ import userRoute from "./routes/userRoute.js";
 import authRoute from "./routes/authRoute.js";
 import donationRoute from "./routes/donationRoute.js";
 import helpRoute from "./routes/helpRoute.js";
+import serviceRoutes from "./routes/serviceRoutes.js";
 
 dotenv.config();
 
 const app = express();
-
-
 
 app.use(express.json());
 
@@ -23,7 +22,7 @@ app.use(cors({
 
 app.use(cookieParser());
 
-
+app.use("/api/services", serviceRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -31,33 +30,24 @@ app.get("/", (req, res) => {
   });
 });
 
-
-
 app.use("/auth", authRoute);
 app.use("/user", userRoute);
 app.use("/donations", donationRoute);
 app.use("/help", helpRoute);
 
-// Port
 const PORT = process.env.PORT || 4000;
-
-
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-
     console.log("MongoDB connected successfully");
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
-
   })
   .catch((error) => {
-
     console.log(
       "MongoDB connection failed:",
       error.message
     );
-
   });
