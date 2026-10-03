@@ -161,10 +161,13 @@ function Home() {
 
             {/* Find Help */}
            {/* Find Help */}
+{/* Find Help */}
 <button
-  onClick={() => {
-    window.location.href = "/help";
-  }}
+  onClick={() =>
+    document
+      .getElementById("find-help")
+      ?.scrollIntoView({ behavior: "smooth" })
+  }
   className="hover:text-green-700"
 >
   Find Help
@@ -512,11 +515,12 @@ function Home() {
                 Become a Volunteer
               </button>
 
-              <button className="text-left hover:text-white">
-                Partner With Us
-              </button>
-
-              <button className="text-left hover:text-white">Contact Us</button>
+              <button
+  onClick={() => navigate("/contact")}
+  className="text-left hover:text-white"
+>
+  Contact Us
+</button>
             </div>
           </div>
         </div>

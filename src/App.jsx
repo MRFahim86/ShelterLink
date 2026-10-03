@@ -6,8 +6,9 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
+import Contact from "./pages/contact";
 import { useEffect, useState } from "react";
-import Home from "./pages/Home";
+import Home from "./pages/home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Donate from "./pages/Donate";
@@ -194,7 +195,7 @@ function App() {
             </LoginProtection>
           }
         />
-
+<Route path="/contact" element={<Contact />} />
         <Route path="/register" element={<Register />} />
 
         <Route path="/help" element={<Help />} />
