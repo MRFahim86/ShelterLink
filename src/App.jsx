@@ -7,8 +7,9 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import Contact from "./pages/contact";
 import { useEffect, useState } from "react";
+
+import Contact from "./pages/contact";
 import Home from "./pages/home";
 
 import Login from "./pages/Login";
@@ -16,15 +17,20 @@ import Register from "./pages/Register";
 import Donate from "./pages/Donate";
 import User from "./pages/User";
 import Admin from "./pages/Admin";
+
 import Shelter from "./pages/Shelter";
 import Food from "./pages/Food";
 import Medical from "./pages/Medical";
 import Volunteer from "./pages/Volunteer";
+
 import Help from "./pages/Help";
 import DonationInfo from "./pages/DonationInfo";
 import CarbonFootprintDisplay from "./pages/CarbonFootprintDisplay";
 
-// ================= SERVICES PAGE =================
+
+// ======================================================
+// SERVICES PAGE
+// ======================================================
 
 function Services() {
   const [services, setServices] = useState([]);
@@ -53,6 +59,7 @@ function Services() {
       });
   }, []);
 
+
   // Get icon according to service type
   const getServiceIcon = (type) => {
     switch (type) {
@@ -69,9 +76,10 @@ function Services() {
         return "🙋";
 
       default:
-        return "❓";
+        return "❤️";
     }
   };
+
 
   // Get frontend page according to service type
   const getServiceLink = (type) => {
@@ -93,21 +101,34 @@ function Services() {
     }
   };
 
+
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* ================= HEADER ================= */}
+      {/* ==================================================
+          HEADER
+      ================================================== */}
 
-      <header className="bg-white border-b">
+      <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-green-700">
+
+          {/* Logo */}
+
+          <Link
+            to="/"
+            className="text-2xl font-bold text-green-700"
+          >
             ShelterLink
           </Link>
 
+
+          {/* Navigation */}
+
           <nav className="flex gap-8">
+
             <Link
               to="/"
-              className="text-gray-700 hover:text-green-700"
+              className="text-gray-700 hover:text-green-700 transition"
             >
               Home
             </Link>
@@ -118,74 +139,96 @@ function Services() {
             >
               Services
             </Link>
+
           </nav>
+
         </div>
       </header>
 
-      {/* ================= HERO ================= */}
 
-      <section className="text-center py-14 px-6">
+      {/* ==================================================
+          HERO SECTION
+      ================================================== */}
+
+      <section className="bg-green-50 py-20 px-6 text-center">
+
         <p className="text-green-700 font-bold tracking-wide text-lg">
-          HOW CAN WE HELP?
+          OUR SERVICES
         </p>
 
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mt-3">
           Support when you need it most
         </h1>
 
-        <p className="text-gray-600 text-lg mt-5 max-w-3xl mx-auto">
-          ShelterLink connects people with essential support services
-          available in their community.
+        <p className="text-gray-600 text-lg mt-5 max-w-3xl mx-auto leading-relaxed">
+          ShelterLink connects people with essential support
+          services available in their community.
         </p>
+
       </section>
 
-      {/* ================= SERVICES ================= */}
 
-      <section className="max-w-7xl mx-auto px-6 pb-16">
+      {/* ==================================================
+          SERVICES SECTION
+      ================================================== */}
+
+      <section className="max-w-7xl mx-auto px-6 py-16">
 
         {/* Loading */}
 
         {loading && (
-          <div className="text-center py-12">
+          <div className="text-center py-16">
+
             <p className="text-gray-600 text-lg">
               Loading services...
             </p>
+
           </div>
         )}
+
 
         {/* Error */}
 
         {!loading && error && (
-          <div className="text-center py-12">
-            <p className="text-red-600 text-lg">
+          <div className="text-center py-16">
+
+            <p className="text-red-600 text-lg font-semibold">
               {error}
             </p>
 
             <p className="text-gray-500 mt-2">
               Please make sure the backend server is running.
             </p>
+
           </div>
         )}
 
-        {/* Empty database */}
+
+        {/* Empty Database */}
 
         {!loading && !error && services.length === 0 && (
-          <div className="text-center py-12">
+          <div className="text-center py-16">
+
             <p className="text-gray-600 text-lg">
               No services available.
             </p>
 
             <p className="text-gray-500 mt-2">
-              Please add services to the database.
+              Please add services to MongoDB.
             </p>
+
           </div>
         )}
+
 
         {/* Service Cards */}
 
         {!loading && !error && services.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
             {services.map((service) => (
+
               <ServiceCard
                 key={service._id}
                 icon={getServiceIcon(service.type)}
@@ -196,15 +239,23 @@ function Services() {
                 image={service.image}
                 link={getServiceLink(service.type)}
               />
+
             ))}
+
           </div>
+
         )}
+
       </section>
+
     </div>
   );
 }
 
-// ================= SERVICE CARD =================
+
+// ======================================================
+// SERVICE CARD
+// ======================================================
 
 function ServiceCard({
   icon,
@@ -215,105 +266,195 @@ function ServiceCard({
   image,
   link,
 }) {
+
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 text-center hover:shadow-lg transition">
 
-      {/* Image if available */}
+    <div
+      className="
+        bg-white
+        rounded-2xl
+        border
+        border-gray-200
+        overflow-hidden
+        shadow-sm
+        hover:shadow-xl
+        hover:-translate-y-1
+        transition-all
+        duration-300
+      "
+    >
 
-      {image ? (
-        <div className="w-16 h-16 rounded-full overflow-hidden mx-auto">
+      {/* ==================================================
+          IMAGE / ICON
+      ================================================== */}
+
+      <div className="h-44 bg-green-50 flex items-center justify-center">
+
+        {image ? (
+
           <img
             src={image}
             alt={title}
             className="w-full h-full object-cover"
           />
-        </div>
-      ) : (
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-3xl">
-          {icon}
-        </div>
-      )}
 
-      {/* Title */}
+        ) : (
 
-      <h2 className="text-2xl font-bold text-gray-900 mt-6">
-        {title}
-      </h2>
+          <div
+            className="
+              w-24
+              h-24
+              rounded-full
+              bg-green-100
+              flex
+              items-center
+              justify-center
+              text-5xl
+            "
+          >
+            {icon}
+          </div>
 
-      {/* Description */}
+        )}
 
-      <p className="text-gray-600 mt-4 leading-relaxed min-h-[90px]">
-        {description}
-      </p>
+      </div>
 
-      {/* Location */}
 
-      {location && (
-        <p className="text-sm text-gray-500 mt-3">
-          📍 {location}
+      {/* ==================================================
+          CARD CONTENT
+      ================================================== */}
+
+      <div className="p-6">
+
+        {/* Title */}
+
+        <h2 className="text-xl font-bold text-gray-900">
+          {title}
+        </h2>
+
+
+        {/* Description */}
+
+        <p className="text-gray-600 mt-3 leading-relaxed min-h-[72px]">
+          {description}
         </p>
-      )}
 
-      {/* Contact */}
 
-      {contact && (
-        <p className="text-sm text-gray-500 mt-2">
-          📞 {contact}
-        </p>
-      )}
+        {/* Location */}
 
-      {/* Button */}
+        {location && (
 
-      <Link
-        to={link}
-        className="inline-block mt-5 text-green-700 font-bold hover:text-green-900"
-      >
-        Learn More →
-      </Link>
+          <p className="text-sm text-gray-500 mt-4">
+            📍 {location}
+          </p>
+
+        )}
+
+
+        {/* Contact */}
+
+        {contact && (
+
+          <p className="text-sm text-gray-500 mt-2">
+            📞 {contact}
+          </p>
+
+        )}
+
+
+        {/* Learn More */}
+
+        <Link
+          to={link}
+          className="
+            inline-block
+            mt-5
+            bg-green-600
+            text-white
+            px-5
+            py-2.5
+            rounded-lg
+            font-semibold
+            hover:bg-green-700
+            transition
+          "
+        >
+          Learn More →
+        </Link>
+
+      </div>
+
     </div>
+
   );
 }
 
-// ================= LOGIN PROTECTION =================
+
+// ======================================================
+// LOGIN PROTECTION
+// ======================================================
 
 function LoginProtection({ children }) {
+
   const location = useLocation();
 
   const [checking, setChecking] = useState(true);
   const [loggedIn, setLoggedIn] = useState(false);
   const [role, setRole] = useState(null);
 
+
   useEffect(() => {
+
     fetch("http://localhost:4000/user/profile", {
       credentials: "include",
     })
+
       .then(async (response) => {
+
         if (response.ok) {
+
           const data = await response.json();
 
           setLoggedIn(true);
           setRole(data.user.role);
+
         }
+
       })
+
       .catch((error) => {
+
         console.log(error);
+
       })
+
       .finally(() => {
+
         setChecking(false);
+
       });
+
   }, []);
+
 
   // While checking login status
 
   if (checking) {
+
     return (
+
       <div className="min-h-screen flex items-center justify-center">
+
         <p className="text-gray-600">
           Loading...
         </p>
+
       </div>
+
     );
+
   }
+
 
   // User is already logged in
 
@@ -322,45 +463,92 @@ function LoginProtection({ children }) {
     // Admin user
 
     if (role === "admin") {
-      return <Navigate to="/admin" replace />;
+
+      return (
+        <Navigate
+          to="/admin"
+          replace
+        />
+      );
+
     }
 
-    // Normal user trying to access login
+
+    // User came from Donate
 
     if (location.state?.from === "/donate") {
-      return <Navigate to="/donate" replace />;
+
+      return (
+        <Navigate
+          to="/donate"
+          replace
+        />
+      );
+
     }
 
-    return <Navigate to="/user" replace />;
+
+    // Normal user
+
+    return (
+      <Navigate
+        to="/user"
+        replace
+      />
+    );
+
   }
+
 
   return children;
 }
 
-// ================= MAIN APP =================
+
+// ======================================================
+// MAIN APP
+// ======================================================
 
 function App() {
+
   return (
+
     <BrowserRouter>
+
+      {/* Carbon Footprint */}
+
       <CarbonFootprintDisplay />
+
+
+      {/* ==================================================
+          ROUTES
+      ================================================== */}
 
       <Routes>
 
-        {/* ================= HOME ================= */}
+
+        {/* ==================================================
+            HOME
+        ================================================== */}
 
         <Route
           path="/"
           element={<Home />}
         />
 
-        {/* ================= CONTACT ================= */}
+
+        {/* ==================================================
+            CONTACT
+        ================================================== */}
 
         <Route
           path="/contact"
           element={<Contact />}
         />
 
-        {/* ================= AUTHENTICATION ================= */}
+
+        {/* ==================================================
+            LOGIN
+        ================================================== */}
 
         <Route
           path="/login"
@@ -371,54 +559,80 @@ function App() {
           }
         />
 
+
+        {/* ==================================================
+            REGISTER
+        ================================================== */}
+
         <Route
           path="/register"
           element={<Register />}
         />
 
-        {/* ================= HELP ================= */}
+
+        {/* ==================================================
+            HELP
+        ================================================== */}
 
         <Route
           path="/help"
           element={<Help />}
         />
 
-        {/* ================= ADMIN ================= */}
+
+        {/* ==================================================
+            ADMIN
+        ================================================== */}
 
         <Route
           path="/admin"
           element={<Admin />}
         />
 
-        {/* ================= USER ================= */}
+
+        {/* ==================================================
+            USER
+        ================================================== */}
 
         <Route
           path="/user"
           element={<User />}
         />
 
-        {/* ================= DONATE ================= */}
+
+        {/* ==================================================
+            DONATE
+        ================================================== */}
 
         <Route
           path="/donate"
           element={<Donate />}
         />
 
-        {/* ================= DONATION INFO ================= */}
+
+        {/* ==================================================
+            DONATION INFORMATION
+        ================================================== */}
 
         <Route
           path="/donation-info"
           element={<DonationInfo />}
         />
 
-        {/* ================= SERVICES ================= */}
+
+        {/* ==================================================
+            SERVICES
+        ================================================== */}
 
         <Route
           path="/services"
           element={<Services />}
         />
 
-        {/* ================= INDIVIDUAL SERVICES ================= */}
+
+        {/* ==================================================
+            INDIVIDUAL SERVICES
+        ================================================== */}
 
         <Route
           path="/services/shelter"
@@ -440,9 +654,13 @@ function App() {
           element={<Volunteer />}
         />
 
+
       </Routes>
+
     </BrowserRouter>
+
   );
 }
+
 
 export default App;
